@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class LoginViewController: UIViewController {
     
@@ -24,7 +25,7 @@ class LoginViewController: UIViewController {
         return view
     }()
     // 登録ボタン
-    let registerButton: UIButton = {
+    lazy var registerButton: UIButton = {
         let button = UIButton(type: UIButtonType.system)
         button.setTitle("Register", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -34,12 +35,35 @@ class LoginViewController: UIViewController {
         button.layer.cornerRadius = 7
         button.layer.masksToBounds = true
         
+        button.addTarget(self, action: #selector(handleRegister), for: .touchUpInside)
+        
         return button
     }()
     
+    func handleRegister() {
+        
+        guard let email = emailTextfield.text , let password = passwordTextfield.text else {
+            
+            print("Form is not valid")
+            return
+        }
+        
+        FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { (user, error) in
+            
+            if error != nil {
+                print(error!)
+                return
+            }
+            
+            //Successfully Authenticated user
+        })
+        
+        
+    }
+    
     // name 入力欄
     let nameTextfield: UITextField = {
-    
+        
         let tf = UITextField()
         tf.placeholder = "Name"
         tf.translatesAutoresizingMaskIntoConstraints = false
@@ -47,7 +71,7 @@ class LoginViewController: UIViewController {
     }()
     
     let nameSeparatorView: UIView = {
-       let view = UIView()
+        let view = UIView()
         view.backgroundColor = UIColor(r: 220, g: 220, b: 220)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -86,9 +110,9 @@ class LoginViewController: UIViewController {
         return view
     }()
     
-
+    
     let profileImageView: UIImageView = {
-       
+        
         let imageView = UIImageView()
         imageView.image = UIImage(named: "login")
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -148,7 +172,7 @@ class LoginViewController: UIViewController {
         nameSeparatorView.widthAnchor.constraint(equalTo: nameTextfield.widthAnchor).isActive = true
         nameSeparatorView.heightAnchor.constraint(equalToConstant: 1).isActive = true
         
-         // nameTextfield *********************************************************************
+        // nameTextfield *********************************************************************
         
         
         
@@ -165,7 +189,7 @@ class LoginViewController: UIViewController {
         emailSeparatorView.topAnchor.constraint(equalTo: emailTextfield.bottomAnchor).isActive = true
         emailSeparatorView.widthAnchor.constraint(equalTo: emailTextfield.widthAnchor).isActive = true
         emailSeparatorView.heightAnchor.constraint(equalToConstant: 1).isActive = true
-
+        
         // emailTextfield *********************************************************************
         
         
@@ -184,7 +208,7 @@ class LoginViewController: UIViewController {
         passwordSeparatorView.heightAnchor.constraint(equalToConstant: 1).isActive = true
         
         // passwordTextfield *********************************************************************
-
+        
         
     }
     
@@ -195,8 +219,8 @@ class LoginViewController: UIViewController {
         registerButton.topAnchor.constraint(equalTo: inputContainerView.bottomAnchor, constant: 12).isActive = true
         
         // width, heightを設定
-       registerButton.widthAnchor.constraint(equalTo: inputContainerView.widthAnchor).isActive = true
-       registerButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        registerButton.widthAnchor.constraint(equalTo: inputContainerView.widthAnchor).isActive = true
+        registerButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
     }
     
     //statusBarStyleを明るい方に設定
