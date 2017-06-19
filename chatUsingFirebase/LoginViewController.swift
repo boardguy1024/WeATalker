@@ -19,11 +19,11 @@ class LoginViewController: UIViewController {
         //基本的にAutoLayoutはTrueになっているためViewのFrame設定しても効かない
         //viewのframeを設定するにはAutoLayoutをfalseする
         view.translatesAutoresizingMaskIntoConstraints = false
-        
         view.layer.cornerRadius = 7
         view.layer.masksToBounds = true
         return view
     }()
+    
     // 登録ボタン
     lazy var registerButton: UIButton = {
         let button = UIButton(type: UIButtonType.system)
@@ -34,7 +34,6 @@ class LoginViewController: UIViewController {
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         button.layer.cornerRadius = 7
         button.layer.masksToBounds = true
-        
         button.addTarget(self, action: #selector(handleRegister), for: .touchUpInside)
         
         return button
@@ -42,7 +41,7 @@ class LoginViewController: UIViewController {
     
     func handleRegister() {
         
-        guard let email = emailTextfield.text , let password = passwordTextfield.text else {
+        guard let email = emailTextfield.text , let password = passwordTextfield.text , let name = nameTextfield.text else {
             
             print("Form is not valid")
             return
@@ -54,8 +53,29 @@ class LoginViewController: UIViewController {
                 print(error!)
                 return
             }
+            guard let uid = user?.uid else {
+                return
+            }
             
             //Successfully Authenticated user
+            let ref = FIRDatabase.database().reference(fromURL: "https://chatfirebase-5b8fc.firebaseio.com/")
+            
+            let userRef = ref.child("users").child(uid)
+            
+            let values = ["name": name , "email": email]
+            
+            userRef.updateChildValues(values, withCompletionBlock: { (error, ref) in
+                
+                if error != nil {
+                    print(error!)
+                    return
+                }
+                
+                print("Successfully saved into Firebase db")
+                
+                
+            })
+            
         })
         
         
