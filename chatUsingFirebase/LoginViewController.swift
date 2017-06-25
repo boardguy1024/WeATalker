@@ -65,53 +65,7 @@ class LoginViewController: UIViewController {
             self.dismiss(animated: true, completion: nil)
         })
     }
-    
-    func handleRegister() {
-        
-        guard let email = emailTextfield.text , let password = passwordTextfield.text , let name = nameTextfield.text else {
-            
-            print("Form is not valid")
-            return
-        }
-        
-        //ユーザー登録が完了するとUIDが取得できる
-        FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { (user, error) in
-            
-            if error != nil {
-                print(error!)
-                return
-            }
-            guard let uid = user?.uid else {
-                return
-            }
-            
-            //Successfully Authenticated user
-            
-            
-            let ref = FIRDatabase.database().reference(fromURL: "https://chatfirebase-5b8fc.firebaseio.com/")
-            
-            let userRef = ref.child("users").child(uid)
-            
-            let values = ["name": name , "email": email]
-            
-            userRef.updateChildValues(values, withCompletionBlock: { (error, ref) in
-                
-                if error != nil {
-                    print(error!)
-                    return
-                }
-                
-                print("Successfully saved into Firebase db")
-                
-                //dbに成功すれば本画面を閉じる
-                self.dismiss(animated: true, completion: nil)
-            })
-            
-        })
-        
-        
-    }
-    
+     
     // name 入力欄
     let nameTextfield: UITextField = {
         
@@ -162,16 +116,21 @@ class LoginViewController: UIViewController {
     }()
     
     
-    let profileImageView: UIImageView = {
+    lazy var profileImageView: UIImageView = {
         
         let imageView = UIImageView()
         imageView.image = UIImage(named: "login")
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.tintColor = .white
+        //タブジェスチャーを追加する
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleSelectProfileImageView)))
+        
+        imageView.isUserInteractionEnabled = true
+        
         return imageView
     }()
     
-    lazy var loginRegisterSegmentControl: UISegmentedControl = {
+       lazy var loginRegisterSegmentControl: UISegmentedControl = {
        
        let sc = UISegmentedControl(items: ["Login","Register"])
         sc.translatesAutoresizingMaskIntoConstraints = false
@@ -180,6 +139,8 @@ class LoginViewController: UIViewController {
         sc.addTarget(self, action: #selector(handleLoginRegisterChange), for: .valueChanged)
         return sc
     }()
+    
+    
 
     //login セグメントを選択した時に呼ばれる
     func handleLoginRegisterChange() {

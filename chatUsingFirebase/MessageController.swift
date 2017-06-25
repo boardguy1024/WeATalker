@@ -14,8 +14,10 @@ class MessageController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //Logoutボタンを左上に配置
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         
+        //Charボタンを右上に配置
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Chat", style: .plain, target: self, action: #selector(handleNewMessage))
         
         //ユーザーのログイン状態をチェック
