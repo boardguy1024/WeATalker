@@ -61,13 +61,53 @@ class NewMessageController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
-        
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! UserCell
         let user = users[indexPath.row]
         
         cell.textLabel?.text = user.name
         cell.detailTextLabel?.text = user.email
+        if let profileImageUrl = user.profileImageUrl {
+          
+            let url = URL(string: profileImageUrl)!
+            
+            URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) in
+                
+                if error != nil {
+                    print(error!)
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    cell.profileImageView.image = UIImage(data: data!)
+                }
+            }).resume()
+        
+        }
+        
         
     return cell
     }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
