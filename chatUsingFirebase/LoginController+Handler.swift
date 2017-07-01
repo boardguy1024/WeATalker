@@ -11,7 +11,6 @@ import Firebase
 
 extension LoginViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    
     //登録ボタン押下時呼び出される
     func handleRegister() {
         
@@ -37,9 +36,10 @@ extension LoginViewController : UIImagePickerControllerDelegate, UINavigationCon
             // uuidを生成してくれるこれでイメージ名を設定しストレージに保存
             let imageName = NSUUID().uuidString
             
-            let storageRef = FIRStorage.storage().reference().child("profile_images").child("\(imageName).png")
+            let storageRef = FIRStorage.storage().reference().child("profile_images").child("\(imageName).jpg")
             
-            if let uploadData = UIImagePNGRepresentation(self.profileImageView.image!) {
+            if let profileImage = self.profileImageView.image ,
+                let uploadData = UIImageJPEGRepresentation(profileImage, 0.1) {
                 
                 storageRef.put(uploadData, metadata: nil, completion: { (metaData, error) in
                     
@@ -72,6 +72,9 @@ extension LoginViewController : UIImagePickerControllerDelegate, UINavigationCon
                 print(error!)
                 return
             }
+            
+            self.messageController?.navigationItem.title = values["name"] as? String
+            // self.messageController?.fetchUserAndSetupNavBarTitle()
             
             print("Successfully saved into Firebase db")
             

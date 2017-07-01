@@ -11,6 +11,8 @@ import Firebase
 
 class MessageController: UITableViewController {
     
+    var messageContrlller: MessageController?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -37,20 +39,23 @@ class MessageController: UITableViewController {
         if FIRAuth.auth()?.currentUser?.uid == nil {
             handleLogout()
         } else {
-            //ユーザーがログイン状態なのでDBからユーザー情報をfetchする
-            let uid = FIRAuth.auth()?.currentUser?.uid
-            FIRDatabase.database().reference().child("users").child(uid!).observe(.value, with: { (snapshot) in
-                
-                if let dictionary = snapshot.value as? [String: Any] {
-                    let name = dictionary["name"] as? String
-                    self.navigationItem.title = name
-                }
-                
-                
-                
-                
-            })
+            fetchUserAndSetupNavBarTitle()
         }
+        
+    }
+    
+    func fetchUserAndSetupNavBarTitle() {
+        
+        //ユーザーがログイン状態なのでDBからユーザー情報をfetchする
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+        
+        FIRDatabase.database().reference().child("users").child(uid).observe(.value, with: { (snapshot) in
+            
+            if let dictionary = snapshot.value as? [String: Any] {
+                let name = dictionary["name"] as? String
+                self.navigationItem.title = name
+            }
+        })
         
     }
     
@@ -64,6 +69,7 @@ class MessageController: UITableViewController {
         }
         
         let loginController = LoginViewController()
+        loginController.messageController = self
         present(loginController, animated: true, completion: nil)
     }
 }

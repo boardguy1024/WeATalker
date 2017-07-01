@@ -11,6 +11,9 @@ import Firebase
 
 class LoginViewController: UIViewController {
     
+    var messageController: MessageController?
+
+    
     // inputView
     let inputContainerView: UIView = {
         let view = UIView()
@@ -61,6 +64,9 @@ class LoginViewController: UIViewController {
                 print(error!)
                 return
             }
+            
+            
+            self.messageController?.checkIfUserIsLoggedIn()
             
             self.dismiss(animated: true, completion: nil)
         })
