@@ -30,7 +30,7 @@ class NewMessageController: UITableViewController {
         FIRDatabase.database().reference().child("users").observe(.childAdded, with: { (snapchat) in
             
             if let dic = snapchat.value as? [String: Any] {
-            
+                
                 let user = User()
                 user.setValuesForKeys(dic)
                 self.users.append(user)
@@ -66,26 +66,18 @@ class NewMessageController: UITableViewController {
         
         cell.textLabel?.text = user.name
         cell.detailTextLabel?.text = user.email
-        if let profileImageUrl = user.profileImageUrl {
-          
-            let url = URL(string: profileImageUrl)!
-            
-            URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) in
-                
-                if error != nil {
-                    print(error!)
-                    return
-                }
-                
-                DispatchQueue.main.async {
-                    cell.profileImageView.image = UIImage(data: data!)
-                }
-            }).resume()
         
+        
+        if let profileImageUrl = user.profileImageUrl {
+            
+            print("user image name is :\(user.name!) and user url is :\(profileImageUrl)")
+            
+            cell.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
+            
         }
         
         
-    return cell
+        return cell
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

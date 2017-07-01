@@ -73,8 +73,11 @@ extension LoginViewController : UIImagePickerControllerDelegate, UINavigationCon
                 return
             }
             
-            self.messageController?.navigationItem.title = values["name"] as? String
-            // self.messageController?.fetchUserAndSetupNavBarTitle()
+           // self.messageController?.navigationItem.title = values["name"] as? String
+            
+            let user = User()
+            user.setValuesForKeys(values)
+            self.messageController?.setupNavBarWithUser(user: user)
             
             print("Successfully saved into Firebase db")
             

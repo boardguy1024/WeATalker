@@ -16,6 +16,7 @@
 		A225BB981EFAC45700BA2198 /* NewMessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A225BB971EFAC45700BA2198 /* NewMessageController.swift */; };
 		A225BB9B1EFACD5900BA2198 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A225BB9A1EFACD5900BA2198 /* User.swift */; };
 		A240D3281EFF9CF400532602 /* LoginController+Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A240D3271EFF9CF400532602 /* LoginController+Handler.swift */; };
+		A29042EF1F077B8A00BEBA4E /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29042EE1F077B8A00BEBA4E /* Extension.swift */; };
 		B9721E355FB794175943C489 /* Pods_chatUsingFirebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 747055ED63CCCA01ABCA13E5 /* Pods_chatUsingFirebase.framework */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +35,7 @@
 		A225BB971EFAC45700BA2198 /* NewMessageController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewMessageController.swift; sourceTree = "<group>"; };
 		A225BB9A1EFACD5900BA2198 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		A240D3271EFF9CF400532602 /* LoginController+Handler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginController+Handler.swift"; sourceTree = "<group>"; };
+		A29042EE1F077B8A00BEBA4E /* Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 		A225BB901EF5849000BA2198 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				A29042ED1F077B6C00BEBA4E /* Helpers */,
 				A225BB991EFACD4800BA2198 /* Model */,
 				A225BB911EF584A500BA2198 /* LoginViewController.swift */,
 				A240D3271EFF9CF400532602 /* LoginController+Handler.swift */,
@@ -114,6 +117,14 @@
 				A225BB9A1EFACD5900BA2198 /* User.swift */,
 			);
 			name = Model;
+			sourceTree = "<group>";
+		};
+		A29042ED1F077B6C00BEBA4E /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				A29042EE1F077B8A00BEBA4E /* Extension.swift */,
+			);
+			name = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -242,6 +253,7 @@
 			files = (
 				A225BB981EFAC45700BA2198 /* NewMessageController.swift in Sources */,
 				A225BB921EF584A500BA2198 /* LoginViewController.swift in Sources */,
+				A29042EF1F077B8A00BEBA4E /* Extension.swift in Sources */,
 				A240D3281EFF9CF400532602 /* LoginController+Handler.swift in Sources */,
 				A225BB811EF57C5B00BA2198 /* MessageController.swift in Sources */,
 				A225BB9B1EFACD5900BA2198 /* User.swift in Sources */,
