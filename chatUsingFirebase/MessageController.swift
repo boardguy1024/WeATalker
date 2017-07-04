@@ -29,6 +29,9 @@ class MessageController: UITableViewController {
     func handleNewMessage() {
         
         let newMessageController = NewMessageController()
+        
+        newMessageController.messageController = self
+        
         let navController = UINavigationController.init(rootViewController: newMessageController)
         present(navController, animated: true, completion: nil)
     }
@@ -105,8 +108,9 @@ class MessageController: UITableViewController {
     }
     
     //ChatContoller表示
-    func showChatController() {
+    func showChatController(user: User) {
         let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewLayout())
+        chatLogController.user = user
         self.navigationController?.pushViewController(chatLogController, animated: true)
         
     }

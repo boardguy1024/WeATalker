@@ -11,6 +11,12 @@ import Firebase
 
 class ChatLogController: UICollectionViewController , UITextFieldDelegate{
     
+    var user: User? {
+        didSet {
+            self.navigationItem.title = user?.name
+        }
+    }
+    
     lazy var inputTextfield: UITextField = {
         let textfield = UITextField()
         textfield.placeholder = "Enter message..."
@@ -22,7 +28,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = "Chat Log Controller"
+       // navigationItem.title = "Chat Log Controller"
         collectionView?.backgroundColor = .white
         setupInputComponent()
     }
@@ -72,13 +78,17 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate{
         inputTextfield.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
     }
     
+    // sendボタンを押下するとメッセージ関連情報をdatabaseにupdateする。
     func handleSend() {
         
         let ref = FIRDatabase.database().reference().child("messages")
         
         let childId = ref.childByAutoId()
-        //dummy 로 key:value 값을 셋팅
-        let value = ["text": inputTextfield.text!, "name": "paku man"]
+        
+        guard let toUserId = user?.id else { return }
+        guard let fromUserId = FIRAuth.auth()?.currentUser?.uid else { return }
+        let timeStamp = String(Date().timeIntervalSince1970)
+        let value = ["text": inputTextfield.text!, "toId": toUserId , "fromId": fromUserId, "timeStamp": timeStamp]
         
         childId.updateChildValues(value)
     }

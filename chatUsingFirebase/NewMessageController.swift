@@ -32,9 +32,9 @@ class NewMessageController: UITableViewController {
             if let dic = snapchat.value as? [String: Any] {
                 
                 let user = User()
+                user.id = snapchat.key
                 user.setValuesForKeys(dic)
                 self.users.append(user)
-                //print("\(user.name!),\(user.email!)")
                 
                 // users 모델에 퓃치한 데이터를 때려박을때마다 테이블 뷰를 리로드 한다.
                 // 그런데 여기는 메인스레드가 아니다 그러므로 크래쉬가 일어난다.
@@ -75,9 +75,21 @@ class NewMessageController: UITableViewController {
             cell.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
             
         }
-        
-        
         return cell
+    }
+    
+    var messageController: MessageController?
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        self.dismiss(animated: true) { 
+            
+            let user = self.users[indexPath.row]
+
+            //chatControllerを表示させる。
+            self.messageController?.showChatController(user: user)
+            
+        }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
