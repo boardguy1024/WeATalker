@@ -12,6 +12,7 @@ import Firebase
 class MessageController: UITableViewController {
     
     var messageContrlller: MessageController?
+    var messages = [Message]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,6 +25,32 @@ class MessageController: UITableViewController {
         
         //ユーザーのログイン状態をチェック
         checkIfUserIsLoggedIn()
+        
+        observeMessages()
+    }
+    
+    func observeMessages() {
+        let ref = FIRDatabase.database().reference().child("messages")
+        
+        ref.observe(.childAdded, with: { (snapshot) in
+            
+            if let dic = snapshot.value as? [String: Any] {
+                
+                let message = Message()
+                
+                message.setValuesForKeys(dic)
+                
+                self.messages.append(message)
+            }
+            
+            DispatchQueue.main.async {
+                
+                self.tableView.reloadData()
+            }
+            
+        }) { (error) in
+            print(error)
+        }
     }
     
     func handleNewMessage() {
@@ -60,6 +87,7 @@ class MessageController: UITableViewController {
                 user.setValuesForKeys(dictionary)
                 
                 self.setupNavBarWithUser(user: user)
+                
             }
         })
     }
@@ -128,6 +156,38 @@ class MessageController: UITableViewController {
         let loginController = LoginViewController()
         loginController.messageController = self
         present(loginController, animated: true, completion: nil)
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cellId")
+        
+        let message = messages[indexPath.row]
+        
+        if let toId = message.toId {
+            
+            let ref = FIRDatabase.database().reference().child("users").child(toId)
+        
+            ref.observe(.value, with: { (snapshot) in
+                
+                if let dic = snapshot.value as? [String: Any] {
+                    
+                    cell.textLabel?.text = dic["name"] as? String
+                }
+                
+            }, withCancel: nil)
+            
+        }
+        
+        
+        //cell.textLabel?.text = messages[indexPath.row].toId
+        cell.detailTextLabel?.text = message.text
+        
+        return cell
     }
 }
 
