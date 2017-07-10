@@ -14,6 +14,7 @@ class MessageController: UITableViewController {
     let cellId = "cellId"
     var messageContrlller: MessageController?
     var messages = [Message]()
+    var messagesDictionary = [String: Message]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +45,21 @@ class MessageController: UITableViewController {
                 
                 message.setValuesForKeys(dic)
                 
-                self.messages.append(message)
+               // self.messages.append(message)
+                
+                //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
+                if let toId = message.toId {
+                    self.messagesDictionary[toId] = message
+                    
+                    self.messages = Array(self.messagesDictionary.values)
+                    
+                    self.messages.sort(by: { (message1, message2) -> Bool in
+                        
+                        return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
+                    })
+                    
+                    }
+                print(self.messagesDictionary.count)
             }
             
             DispatchQueue.main.async {
@@ -167,12 +182,12 @@ class MessageController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-                
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! UserCell
         
         let message = messages[indexPath.row]
         cell.message = message
-       
+        
         
         return cell
     }
