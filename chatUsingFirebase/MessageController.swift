@@ -11,6 +11,7 @@ import Firebase
 
 class MessageController: UITableViewController {
     
+    let cellId = "cellId"
     var messageContrlller: MessageController?
     var messages = [Message]()
     
@@ -22,6 +23,9 @@ class MessageController: UITableViewController {
         
         //Charボタンを右上に配置
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Chat", style: .plain, target: self, action: #selector(handleNewMessage))
+        
+        
+        tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         
         //ユーザーのログイン状態をチェック
         checkIfUserIsLoggedIn()
@@ -163,31 +167,18 @@ class MessageController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cellId")
+                
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! UserCell
         
         let message = messages[indexPath.row]
-        
-        if let toId = message.toId {
-            
-            let ref = FIRDatabase.database().reference().child("users").child(toId)
-        
-            ref.observe(.value, with: { (snapshot) in
-                
-                if let dic = snapshot.value as? [String: Any] {
-                    
-                    cell.textLabel?.text = dic["name"] as? String
-                }
-                
-            }, withCancel: nil)
-            
-        }
-        
-        
-        //cell.textLabel?.text = messages[indexPath.row].toId
-        cell.detailTextLabel?.text = message.text
+        cell.message = message
+       
         
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 72
     }
 }
 
