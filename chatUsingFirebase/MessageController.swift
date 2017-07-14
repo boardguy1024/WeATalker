@@ -31,46 +31,52 @@ class MessageController: UITableViewController {
         //ユーザーのログイン状態をチェック
         checkIfUserIsLoggedIn()
         
-        observeMessages()
+        observeUserMessages()
     }
     
-    func observeMessages() {
-        let ref = FIRDatabase.database().reference().child("messages")
+    func observeUserMessages() {
+        
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+        
+        let ref = FIRDatabase.database().reference().child("user-messages").child(uid)
         
         ref.observe(.childAdded, with: { (snapshot) in
             
-            if let dic = snapshot.value as? [String: Any] {
+            let messageId = snapshot.key
+            let messageRef = FIRDatabase.database().reference().child("messages").child(messageId)
+            
+            messageRef.observeSingleEvent(of: .value, with: { (messageSnapshot) in
                 
-                let message = Message()
-                
-                message.setValuesForKeys(dic)
-                
-               // self.messages.append(message)
-                
-                //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
-                if let toId = message.toId {
-                    self.messagesDictionary[toId] = message
+                if let dic = messageSnapshot.value as? [String: Any] {
                     
-                    self.messages = Array(self.messagesDictionary.values)
+                    let message = Message()
                     
-                    self.messages.sort(by: { (message1, message2) -> Bool in
+                    message.setValuesForKeys(dic)
+                    
+                    // self.messages.append(message)
+                    
+                    //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
+                    if let toId = message.toId {
+                        self.messagesDictionary[toId] = message
                         
-                        return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
-                    })
-                    
+                        self.messages = Array(self.messagesDictionary.values)
+                        
+                        self.messages.sort(by: { (message1, message2) -> Bool in
+                            
+                            return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
+                        })
                     }
-                print(self.messagesDictionary.count)
-            }
+                    print(self.messagesDictionary.count)
+                }
+                DispatchQueue.main.async {
+                    
+                    self.tableView.reloadData()
+                }
+            })
             
-            DispatchQueue.main.async {
-                
-                self.tableView.reloadData()
-            }
-            
-        }) { (error) in
-            print(error)
-        }
+        }, withCancel: nil)
     }
+    
     
     func handleNewMessage() {
         

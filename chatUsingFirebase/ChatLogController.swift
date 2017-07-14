@@ -28,7 +28,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-       // navigationItem.title = "Chat Log Controller"
+        // navigationItem.title = "Chat Log Controller"
         collectionView?.backgroundColor = .white
         setupInputComponent()
     }
@@ -83,18 +83,32 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate{
         
         let ref = FIRDatabase.database().reference().child("messages")
         
-        let childId = ref.childByAutoId()
+        let childRef = ref.childByAutoId()
         
         guard let toUserId = user?.id else { return }
         guard let fromUserId = FIRAuth.auth()?.currentUser?.uid else { return }
         let timeStamp = String(Date().timeIntervalSince1970)
         let value = ["text": inputTextfield.text!, "toId": toUserId , "fromId": fromUserId, "timeStamp": timeStamp]
         
-        childId.updateChildValues(value)
+        //childRef.updateChildValues(value)
+        
+        childRef.updateChildValues(value) { (error, ref) in
+            
+            if error != nil {
+                print(error!)
+                return
+            }
+            //送信するメッセージValueを user-messageの中に送信者uid名でdatabaseにUpdateする。
+            let userMessageRef =  FIRDatabase.database().reference().child("user-messages").child(fromUserId)
+            
+            let messageId = childRef.key
+            
+            userMessageRef.updateChildValues([messageId: 1])
+        }
     }
     
     //MARK:- Delegate Methods
-   
+    
     //textFieldでreturnキーが押下した際、呼ばれる
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
