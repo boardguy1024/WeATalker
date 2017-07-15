@@ -168,7 +168,13 @@ class MessageController: UITableViewController {
     
     //ChatContoller表示
     func showChatController(user: User) {
-        let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewLayout())
+        
+        // レイアウト作成
+        let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.itemSize = CGSize(width: 50 , height: 50)
+        
+        let chatLogController = ChatLogController(collectionViewLayout: flowLayout)
+        
         chatLogController.user = user
         self.navigationController?.pushViewController(chatLogController, animated: true)
         
@@ -202,6 +208,30 @@ class MessageController: UITableViewController {
         
         
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let message = messages[indexPath.row]
+        
+        guard let chatPartnerId = message.chatPartnerId() else { return }
+        
+        let ref = FIRDatabase.database().reference().child("users").child(chatPartnerId)
+        
+        ref.observe(.value, with: { (snapshot) in
+            
+            guard let dictionary = snapshot.value as? [String: Any] else { return }
+            
+            let user = User()
+            user.id = chatPartnerId
+            user.setValuesForKeys(dictionary)
+            
+            self.showChatController(user: user)
+            
+            
+            
+        }, withCancel: nil)
+        
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

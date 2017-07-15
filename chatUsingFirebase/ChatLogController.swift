@@ -9,12 +9,55 @@
 import UIKit
 import Firebase
 
-class ChatLogController: UICollectionViewController , UITextFieldDelegate{
+class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICollectionViewDelegateFlowLayout {
+    
+    let cellId = "cellId"
     
     var user: User? {
         didSet {
             self.navigationItem.title = user?.name
+            
+            observeMessage()
         }
+    }
+    
+    var messages = [Message]()
+    
+    private func observeMessage() {
+        
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+        
+        let userMessageRef = FIRDatabase.database().reference().child("user-messages").child(uid)
+        
+        //user-messageを取得
+        userMessageRef.observe(.childAdded, with: { (snapshot) in
+            
+            //該当するmessageを取得
+            let messageId = snapshot.key
+            let messageRef = FIRDatabase.database().reference().child("messages").child(messageId)
+            
+            messageRef.observeSingleEvent(of: .value, with: { (messageSnapshot) in
+                
+                guard let dictionary = messageSnapshot.value as? [String: Any] else { return }
+                
+                let message = Message()
+                message.setValuesForKeys(dictionary)
+                
+                // チャット画面のuser idとmessageのidが一致するのみメッセージを表示する
+                if message.chatPartnerId() == self.user?.id {
+                    
+                    self.messages.append(message)
+                    
+                    DispatchQueue.main.async {
+                        self.collectionView?.reloadData()
+                    }
+ 
+                }
+                
+                
+            }, withCancel: nil)
+            
+        }, withCancel: nil)
     }
     
     lazy var inputTextfield: UITextField = {
@@ -28,14 +71,17 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // navigationItem.title = "Chat Log Controller"
+        collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = .white
+        collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
+        
         setupInputComponent()
     }
     
     func setupInputComponent() {
         
         let containerView = UIView()
+        containerView.backgroundColor = .white
         containerView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(containerView)
         
@@ -114,7 +160,28 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate{
         
     }
     
-    //MARK:- Delegate Methods
+    //MARK:- collectionView Delegate Methods
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
+        
+        let message = messages[indexPath.row]
+        
+        cell.textView.text = message.text
+        return cell
+    }
+    
+    //MARK:- collectionViewLayoutFlow Delegate Methods
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: self.view.frame.width, height: 80)
+    }
+    
+    
+    //MARK:- textField Delegate Methods
     
     //textFieldでreturnキーが押下した際、呼ばれる
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

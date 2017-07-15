@@ -31,16 +31,8 @@ class UserCell: UITableViewCell {
     
     private func setupNameAndProfileImage() {
         
-        let chatPartnerId: String?
-        
-        //現在ログイン中のcurrentUser.uid と 取得したmessageのfromIdが一致した場合のみ、message.toidをセットする
-        if message?.fromId == FIRAuth.auth()?.currentUser?.uid {
-            chatPartnerId = message?.toId
-        } else {
-            chatPartnerId = message?.fromId
-        }
-        
-        if let id = chatPartnerId {
+              
+        if let id = message?.chatPartnerId() {
             
             let ref = FIRDatabase.database().reference().child("users").child(id)
             

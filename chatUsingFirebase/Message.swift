@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class Message: NSObject {
 
@@ -14,4 +15,10 @@ class Message: NSObject {
     var text: String?
     var timeStamp: NSNumber?
     var toId: String?
+    
+    func chatPartnerId() -> String? {
+        
+        //現在ログイン中のcurrentUser.uid と 取得したmessageのfromIdが一致した場合のみ、message.toidをセットする
+        return  fromId == FIRAuth.auth()?.currentUser?.uid ? toId : fromId
+       }
 }
