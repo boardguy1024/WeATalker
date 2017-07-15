@@ -31,7 +31,6 @@ class MessageController: UITableViewController {
         //ユーザーのログイン状態をチェック
         checkIfUserIsLoggedIn()
         
-        observeUserMessages()
     }
     
     func observeUserMessages() {
@@ -118,6 +117,13 @@ class MessageController: UITableViewController {
     }
     
     func setupNavBarWithUser(user: User) {
+        //初期化
+        messages.removeAll()
+        messagesDictionary.removeAll()
+        tableView.reloadData()
+        
+        //userのメッセージを取得後、tableViewをreload
+        observeUserMessages()
         
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)

@@ -14,23 +14,8 @@ class UserCell: UITableViewCell {
     var message: Message? {
         didSet {
             
-            if let toId = message?.toId {
-                
-                let ref = FIRDatabase.database().reference().child("users").child(toId)
-                
-                ref.observe(.value, with: { (snapshot) in
-                    
-                    if let dic = snapshot.value as? [String: Any] {
-                        
-                        self.textLabel?.text = dic["name"] as? String
-                        
-                        if let profileImageUrl = dic["profileImageUrl"] as? String {
-                        self.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
-                        }
-                    }
-                    
-                }, withCancel: nil)
-            }
+            setupNameAndProfileImage()
+            
             detailTextLabel?.text = message?.text
             
             if let second = message?.timeStamp?.doubleValue {
@@ -42,6 +27,37 @@ class UserCell: UITableViewCell {
             }
             
         }
+    }
+    
+    private func setupNameAndProfileImage() {
+        
+        let chatPartnerId: String?
+        
+        //現在ログイン中のcurrentUser.uid と 取得したmessageのfromIdが一致した場合のみ、message.toidをセットする
+        if message?.fromId == FIRAuth.auth()?.currentUser?.uid {
+            chatPartnerId = message?.toId
+        } else {
+            chatPartnerId = message?.fromId
+        }
+        
+        if let id = chatPartnerId {
+            
+            let ref = FIRDatabase.database().reference().child("users").child(id)
+            
+            ref.observe(.value, with: { (snapshot) in
+                
+                if let dic = snapshot.value as? [String: Any] {
+                    
+                    self.textLabel?.text = dic["name"] as? String
+                    
+                    if let profileImageUrl = dic["profileImageUrl"] as? String {
+                        self.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
+                    }
+                }
+                
+            }, withCancel: nil)
+        }
+
     }
     
     let profileImageView: UIImageView =  {
@@ -58,7 +74,7 @@ class UserCell: UITableViewCell {
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .lightGray
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "HH:MM:SS"
+        //label.text = "HH:MM:SS"
         return label
     }()
     

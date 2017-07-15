@@ -98,13 +98,20 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate{
                 print(error!)
                 return
             }
-            //送信するメッセージValueを user-messageの中に送信者uid名でdatabaseにUpdateする。
-            let userMessageRef =  FIRDatabase.database().reference().child("user-messages").child(fromUserId)
             
             let messageId = childRef.key
-            
+            //送信者
+            //送信するメッセージValueを user-messageの中に送信者uid名でdatabaseにUpdateする。
+            let userMessageRef =  FIRDatabase.database().reference().child("user-messages").child(fromUserId)
             userMessageRef.updateChildValues([messageId: 1])
+            
+            //受信者
+            //送信するメッセージValueを user-messageの中に受信者uid名でdatabaseにUpdateする。
+            let recipientMessageRef = FIRDatabase.database().reference().child("user-messages").child(toUserId)
+            recipientMessageRef.updateChildValues([messageId: 1])
         }
+        
+        
     }
     
     //MARK:- Delegate Methods
