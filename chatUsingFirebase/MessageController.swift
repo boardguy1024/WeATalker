@@ -33,6 +33,7 @@ class MessageController: UITableViewController {
         
     }
     
+    
     func observeUserMessages() {
         
         guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
@@ -65,17 +66,24 @@ class MessageController: UITableViewController {
                             return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
                         })
                     }
-                    print(self.messagesDictionary.count)
-                }
-                DispatchQueue.main.async {
-                    
-                    self.tableView.reloadData()
+                    //tableView reloadを無効化
+                    self.timer?.invalidate()
+                    //この処理は無効化されるが、最後のループのみ実行されるのでtableView Reloadは１回のみ実行される
+                    //(intervalによって少し変動)
+                    self.timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(self.handleReloadTableView), userInfo: nil, repeats: false)
                 }
             })
             
         }, withCancel: nil)
     }
+    var timer: Timer?
     
+    func handleReloadTableView() {
+        DispatchQueue.main.async {
+            print("tableView reloaded")
+            self.tableView.reloadData()
+        }
+    }
     
     func handleNewMessage() {
         

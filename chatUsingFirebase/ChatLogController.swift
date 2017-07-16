@@ -53,7 +53,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
                     DispatchQueue.main.async {
                         self.collectionView?.reloadData()
                     }
- 
+
                 }
                 
                 
@@ -199,6 +199,9 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     
     private func setupCellwithColor(cell: ChatMessageCell, message: Message) {
        
+        if let profileImageUrl = user?.profileImageUrl {
+            cell.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
+        }
         if message.fromId == FIRAuth.auth()?.currentUser?.uid {
             
             //自分のメッセージ
