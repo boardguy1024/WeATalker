@@ -21,6 +21,8 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         }
     }
     
+    
+    
     var messages = [Message]()
     
     private func observeMessage() {
@@ -71,11 +73,22 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //セルをtopから8point離す, bottomから60離す
+        collectionView?.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 60, right: 0)
+        //スクロール領域もcontentInsetに合わせる
+        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 52, right: 0)
         collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = .white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         
         setupInputComponent()
+    }
+    
+    //このアプリではlandScapeモードは対応しないが、念のため入れておく
+    //サイズ変更によるcollectionViewレイアウト更新
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+      
+        collectionView?.collectionViewLayout.invalidateLayout()
     }
     
     func setupInputComponent() {
@@ -136,14 +149,15 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         let timeStamp = String(Date().timeIntervalSince1970)
         let value = ["text": inputTextfield.text!, "toId": toUserId , "fromId": fromUserId, "timeStamp": timeStamp]
         
-        //childRef.updateChildValues(value)
-        
         childRef.updateChildValues(value) { (error, ref) in
             
             if error != nil {
                 print(error!)
                 return
             }
+            
+            //メッセージがupdataできたのみ打ち込んだメッセージを削除
+            self.inputTextfield.text = nil
             
             let messageId = childRef.key
             //送信者
@@ -172,14 +186,31 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         let message = messages[indexPath.row]
         
         cell.textView.text = message.text
+        
+        //25でwidthを微調整
+        cell.bubbleWidthAnchor?.constant = estimateFrameForText(text: message.text!).width + 25
+        
         return cell
     }
     
     //MARK:- collectionViewLayoutFlow Delegate Methods
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.view.frame.width, height: 80)
+        
+        var height: CGFloat = 80
+        if let text = messages[indexPath.row].text {
+          height = estimateFrameForText(text: text).height + 20
+        }
+        
+        return CGSize(width: self.view.frame.width, height: height)
     }
     
+    private func estimateFrameForText(text: String) -> CGRect {
+        
+        let size = CGSize(width: 200, height: 1000)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        
+        return  NSString(string: text).boundingRect(with: size, options: options , attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 16)], context: nil)
+    }
     
     //MARK:- textField Delegate Methods
     

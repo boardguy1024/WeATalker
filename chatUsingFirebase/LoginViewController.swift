@@ -299,12 +299,7 @@ class LoginViewController: UIViewController {
     }
 }
 
-extension UIColor {
-    //拡張でrgbInitを簡単に設定できるように新たにInitを追加
-    convenience init(r: CGFloat, g: CGFloat, b: CGFloat) {
-        self.init(red: r/255, green: g/255, blue: b/255, alpha: 1)
-    }
-}
+
 
 
 

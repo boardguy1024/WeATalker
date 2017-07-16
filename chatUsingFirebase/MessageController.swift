@@ -55,8 +55,8 @@ class MessageController: UITableViewController {
                     // self.messages.append(message)
                     
                     //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
-                    if let toId = message.toId {
-                        self.messagesDictionary[toId] = message
+                    if let chatPartnerId = message.chatPartnerId() {
+                        self.messagesDictionary[chatPartnerId] = message
                         
                         self.messages = Array(self.messagesDictionary.values)
                         
@@ -163,7 +163,6 @@ class MessageController: UITableViewController {
         
         self.navigationItem.titleView = titleView
         
-        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
     }
     
     //ChatContoller表示
