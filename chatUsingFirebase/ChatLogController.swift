@@ -140,6 +140,8 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     // sendボタンを押下するとメッセージ関連情報をdatabaseにupdateする。
     func handleSend() {
         
+        if inputTextfield.text == "" { return }
+        
         let ref = FIRDatabase.database().reference().child("messages")
         
         let childRef = ref.childByAutoId()
@@ -187,10 +189,33 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         
         cell.textView.text = message.text
         
+        setupCellwithColor(cell: cell, message: message)
+        
         //25でwidthを微調整
         cell.bubbleWidthAnchor?.constant = estimateFrameForText(text: message.text!).width + 25
         
         return cell
+    }
+    
+    private func setupCellwithColor(cell: ChatMessageCell, message: Message) {
+       
+        if message.fromId == FIRAuth.auth()?.currentUser?.uid {
+            
+            //自分のメッセージ
+            cell.bubbleView.backgroundColor = blueColor
+            cell.textView.textColor = .white
+            cell.bubbleleftAnchor?.isActive = false
+            cell.bubbleRightAnchor?.isActive = true
+            cell.profileImageView.isHidden = true
+        } else {
+            //相手のメッセージ
+            cell.bubbleView.backgroundColor = grayColor
+            cell.textView.textColor = .darkGray
+            cell.bubbleleftAnchor?.isActive = true
+            cell.bubbleRightAnchor?.isActive = false
+            cell.profileImageView.isHidden = false
+        }
+
     }
     
     //MARK:- collectionViewLayoutFlow Delegate Methods
