@@ -53,7 +53,6 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
                     DispatchQueue.main.async {
                         self.collectionView?.reloadData()
                     }
-
                 }
                 
                 
@@ -82,14 +81,40 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         
         setupInputComponent()
+        
+        setupKeyboardObservers()
+    }
+    
+    private func setupKeyboardObservers() {
+        
+        //メッセージ送信欄の位置をキーボードの上に動的に表示するためにnotificationを登録
+        NotificationCenter.default.addObserver(self, selector: #selector(handlekeyboardWillShow), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handlekeyboardWillHide), name: .UIKeyboardWillHide, object: nil)
+    }
+    
+    func handlekeyboardWillShow(notification: Notification) {
+        guard let keyboardFrame = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect else { return }
+        guard let keyboardDuration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? Double else { return }
+        
+        containerViewButtomAnchor?.constant = -keyboardFrame.height
+        
+        UIView.animate(withDuration: keyboardDuration) { 
+            self.view.layoutIfNeeded()
+        }
+    
+    }
+    func handlekeyboardWillHide(notification: Notification) {
+            containerViewButtomAnchor?.constant = 0
     }
     
     //このアプリではlandScapeモードは対応しないが、念のため入れておく
     //サイズ変更によるcollectionViewレイアウト更新
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-      
+        
         collectionView?.collectionViewLayout.invalidateLayout()
     }
+    
+    var containerViewButtomAnchor: NSLayoutConstraint?
     
     func setupInputComponent() {
         
@@ -100,7 +125,8 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         
         //constraint
         containerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        containerViewButtomAnchor = containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        containerViewButtomAnchor?.isActive = true
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         containerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
@@ -198,7 +224,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     }
     
     private func setupCellwithColor(cell: ChatMessageCell, message: Message) {
-       
+        
         if let profileImageUrl = user?.profileImageUrl {
             cell.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
         }
@@ -218,7 +244,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
             cell.bubbleRightAnchor?.isActive = false
             cell.profileImageView.isHidden = false
         }
-
+        
     }
     
     //MARK:- collectionViewLayoutFlow Delegate Methods
@@ -226,7 +252,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         
         var height: CGFloat = 80
         if let text = messages[indexPath.row].text {
-          height = estimateFrameForText(text: text).height + 20
+            height = estimateFrameForText(text: text).height + 20
         }
         
         return CGSize(width: self.view.frame.width, height: height)
