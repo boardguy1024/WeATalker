@@ -42,38 +42,43 @@ class MessageController: UITableViewController {
         
         ref.observe(.childAdded, with: { (snapshot) in
             
-            let messageId = snapshot.key
-            let messageRef = FIRDatabase.database().reference().child("messages").child(messageId)
+            let userId = snapshot.key
             
-            messageRef.observeSingleEvent(of: .value, with: { (messageSnapshot) in
+            ref.child(userId).observe(.childAdded, with: { (snapshot) in
                 
-                if let dic = messageSnapshot.value as? [String: Any] {
+                let messageId = snapshot.key
+                
+                let messageRef = FIRDatabase.database().reference().child("messages").child(messageId)
+                
+                messageRef.observeSingleEvent(of: .value, with: { (messageSnapshot) in
                     
-                    let message = Message()
-                    
-                    message.setValuesForKeys(dic)
-                    
-                    // self.messages.append(message)
-                    
-                    //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
-                    if let chatPartnerId = message.chatPartnerId() {
-                        self.messagesDictionary[chatPartnerId] = message
+                    if let dic = messageSnapshot.value as? [String: Any] {
                         
-                        self.messages = Array(self.messagesDictionary.values)
+                        let message = Message()
                         
-                        self.messages.sort(by: { (message1, message2) -> Bool in
+                        message.setValuesForKeys(dic)
+                        
+                        // self.messages.append(message)
+                        
+                        //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
+                        if let chatPartnerId = message.chatPartnerId() {
+                            self.messagesDictionary[chatPartnerId] = message
                             
-                            return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
-                        })
+                            self.messages = Array(self.messagesDictionary.values)
+                            
+                            self.messages.sort(by: { (message1, message2) -> Bool in
+                                
+                                return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
+                            })
+                        }
+                        //tableView reloadを無効化
+                        self.timer?.invalidate()
+                        //この処理は無効化されるが、最後のループのみ実行されるのでtableView Reloadは１回のみ実行される
+                        //(intervalによって少し変動)
+                        self.timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(self.handleReloadTableView), userInfo: nil, repeats: false)
                     }
-                    //tableView reloadを無効化
-                    self.timer?.invalidate()
-                    //この処理は無効化されるが、最後のループのみ実行されるのでtableView Reloadは１回のみ実行される
-                    //(intervalによって少し変動)
-                    self.timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(self.handleReloadTableView), userInfo: nil, repeats: false)
-                }
-            })
-            
+                })
+            }, withCancel: nil)
         }, withCancel: nil)
     }
     var timer: Timer?

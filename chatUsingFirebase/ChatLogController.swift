@@ -26,8 +26,9 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     private func observeMessage() {
         
         guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+        guard let toId = user?.id else { return }
         
-        let userMessageRef = FIRDatabase.database().reference().child("user-messages").child(uid)
+        let userMessageRef = FIRDatabase.database().reference().child("user-messages").child(uid).child(toId)
         
         //user-messageを取得
         userMessageRef.observe(.childAdded, with: { (snapshot) in
@@ -73,16 +74,16 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         //セルをtopから8point離す, bottomから60離す
         collectionView?.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
         //スクロール領域もcontentInsetに合わせる
-//        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
+        //        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
         collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = .white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         //keyboardの操作をinterectivityする
         collectionView?.keyboardDismissMode = .interactive
-//        
-//        setupInputComponent()
-//        
-//        setupKeyboardObservers()
+        //
+        //        setupInputComponent()
+        //
+        //        setupKeyboardObservers()
     }
     
     lazy var inputContainerView: UIView = {
@@ -100,7 +101,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         separatorView.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
         separatorView.bottomAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
         separatorView.heightAnchor.constraint(equalToConstant: 1).isActive = true
-
+        
         
         let sendButton = UIButton(type: .system)
         sendButton.setTitle("send", for: .normal)
@@ -121,7 +122,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         self.inputTextfield.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
         self.inputTextfield.rightAnchor.constraint(equalTo: sendButton.leftAnchor).isActive = true
         self.inputTextfield.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
-
+        
         return containerView
     }()
     
@@ -191,9 +192,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         containerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        
-        
-            }
+    }
     
     // sendボタンを押下するとメッセージ関連情報をdatabaseにupdateする。
     func handleSend() {
@@ -222,12 +221,12 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
             let messageId = childRef.key
             //送信者
             //送信するメッセージValueを user-messageの中に送信者uid名でdatabaseにUpdateする。
-            let userMessageRef =  FIRDatabase.database().reference().child("user-messages").child(fromUserId)
+            let userMessageRef =  FIRDatabase.database().reference().child("user-messages").child(fromUserId).child(toUserId)
             userMessageRef.updateChildValues([messageId: 1])
             
             //受信者
             //送信するメッセージValueを user-messageの中に受信者uid名でdatabaseにUpdateする。
-            let recipientMessageRef = FIRDatabase.database().reference().child("user-messages").child(toUserId)
+            let recipientMessageRef = FIRDatabase.database().reference().child("user-messages").child(toUserId).child(fromUserId)
             recipientMessageRef.updateChildValues([messageId: 1])
         }
         
