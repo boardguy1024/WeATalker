@@ -63,25 +63,27 @@ class MessageController: UITableViewController {
                         //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
                         if let chatPartnerId = message.chatPartnerId() {
                             self.messagesDictionary[chatPartnerId] = message
-                            
-                            self.messages = Array(self.messagesDictionary.values)
-                            
-                            self.messages.sort(by: { (message1, message2) -> Bool in
-                                
-                                return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
-                            })
                         }
-                        //tableView reloadを無効化
-                        self.timer?.invalidate()
-                        //この処理は無効化されるが、最後のループのみ実行されるのでtableView Reloadは１回のみ実行される
-                        //(intervalによって少し変動)
-                        self.timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(self.handleReloadTableView), userInfo: nil, repeats: false)
+                        
+                        self.attemptReloadOfTable()
                     }
                 })
             }, withCancel: nil)
         }, withCancel: nil)
     }
     var timer: Timer?
+    
+    private func attemptReloadOfTable() {
+        //tableView reloadを無効化
+        self.timer?.invalidate()
+        //この処理は無効化されるが、最後のループのみ実行されるのでtableView Reloadは１回のみ実行される
+        //(intervalによって少し変動)
+        self.timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(self.handleReloadTableView), userInfo: nil, repeats: false)
+        self.messages = Array(self.messagesDictionary.values)
+        self.messages.sort(by: { (message1, message2) -> Bool in
+            return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
+        })
+    }
     
     func handleReloadTableView() {
         DispatchQueue.main.async {

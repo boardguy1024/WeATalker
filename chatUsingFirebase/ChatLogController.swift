@@ -44,17 +44,12 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
                 let message = Message()
                 message.setValuesForKeys(dictionary)
                 
-                // チャット画面のuser idとmessageのidが一致するのみメッセージを表示する
-                if message.chatPartnerId() == self.user?.id {
-                    
-                    self.messages.append(message)
-                    
-                    DispatchQueue.main.async {
-                        self.collectionView?.reloadData()
-                    }
+                self.messages.append(message)
+                
+                DispatchQueue.main.async {
+                    self.collectionView?.reloadData()
                 }
-                
-                
+
             }, withCancel: nil)
             
         }, withCancel: nil)
