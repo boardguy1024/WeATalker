@@ -189,38 +189,10 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
     
     
     private func sendMessageWithImageUrl(imageUrl: String , image: UIImage) {
-        let ref = FIRDatabase.database().reference().child("messages")
-        //messageの中に chileの uidを生成
-        let childRef = ref.childByAutoId()
-        //相手Userのuidを取得
-        guard let toId = user?.id else { return }
-        //LoginUserのuidを取得
-        guard let fromId = FIRAuth.auth()?.currentUser?.uid else { return }
         
-        let timeStamp = String(Date().timeIntervalSince1970)
-        let values = ["toId": toId , "fromId": fromId, "timeStamp": timeStamp,
-                      "imageUrl": imageUrl, "imageWidth": image.size.width, "imageHeight": image.size.height] as [String : Any]
+        let values: [String: Any] = ["imageUrl": imageUrl, "imageWidth": image.size.width, "imageHeight": image.size.height]
         
-        childRef.updateChildValues(values) { (error, ref) in
-            
-            if error != nil {
-                print(error!)
-                return
-            }
-            
-            let messageId = childRef.key
-            //送信者
-            //送信するメッセージValueを user-messageの中に送信者uid名でdatabaseにUpdateする。
-            let userMessageRef =  FIRDatabase.database().reference().child("user-messages").child(fromId).child(toId)
-            userMessageRef.updateChildValues([messageId: 1])
-            
-            //受信者
-            //送信するメッセージValueを user-messageの中に受信者uid名でdatabaseにUpdateする。
-            let recipientMessageRef = FIRDatabase.database().reference().child("user-messages").child(toId).child(fromId)
-            recipientMessageRef.updateChildValues([messageId: 1])
-            
-        }
-        
+        sendMessageWithProperies(properies: values)
     }
     
     //UIViewControllerのpropertyの一つ
@@ -280,35 +252,47 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         
         if inputTextfield.text == "" { return }
         
+        let value: [String: Any] = ["text": inputTextfield.text!]
+        
+        sendMessageWithProperies(properies: value)
+        
+        inputTextfield.text = nil
+    }
+    
+    private func sendMessageWithProperies(properies: [String: Any]) {
+        
         let ref = FIRDatabase.database().reference().child("messages")
-        
+        //messageの中に chileの uidを生成
         let childRef = ref.childByAutoId()
+        //相手Userのuidを取得
+        guard let toId = user?.id else { return }
+        //LoginUserのuidを取得
+        guard let fromId = FIRAuth.auth()?.currentUser?.uid else { return }
         
-        guard let toUserId = user?.id else { return }
-        guard let fromUserId = FIRAuth.auth()?.currentUser?.uid else { return }
         let timeStamp = String(Date().timeIntervalSince1970)
-        let value = ["text": inputTextfield.text!, "toId": toUserId , "fromId": fromUserId, "timeStamp": timeStamp]
+        var values: [String: Any] = ["toId": toId , "fromId": fromId, "timeStamp": timeStamp]
         
-        childRef.updateChildValues(value) { (error, ref) in
+        //append properties dictionary
+        properies.forEach({values[$0] = $1})
+        
+        childRef.updateChildValues(values) { (error, ref) in
             
             if error != nil {
                 print(error!)
                 return
             }
             
-            //メッセージがupdataできたのみ打ち込んだメッセージを削除
-            self.inputTextfield.text = nil
-            
             let messageId = childRef.key
             //送信者
             //送信するメッセージValueを user-messageの中に送信者uid名でdatabaseにUpdateする。
-            let userMessageRef =  FIRDatabase.database().reference().child("user-messages").child(fromUserId).child(toUserId)
+            let userMessageRef =  FIRDatabase.database().reference().child("user-messages").child(fromId).child(toId)
             userMessageRef.updateChildValues([messageId: 1])
             
             //受信者
             //送信するメッセージValueを user-messageの中に受信者uid名でdatabaseにUpdateする。
-            let recipientMessageRef = FIRDatabase.database().reference().child("user-messages").child(toUserId).child(fromUserId)
+            let recipientMessageRef = FIRDatabase.database().reference().child("user-messages").child(toId).child(fromId)
             recipientMessageRef.updateChildValues([messageId: 1])
+            
         }
         
     }
