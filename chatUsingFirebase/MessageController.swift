@@ -15,6 +15,7 @@ class MessageController: UITableViewController {
     var messageContrlller: MessageController?
     var messages = [Message]()
     var messagesDictionary = [String: Message]()
+    var timer: Timer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +34,6 @@ class MessageController: UITableViewController {
         
     }
     
-    
     func observeUserMessages() {
         
         guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
@@ -48,30 +48,34 @@ class MessageController: UITableViewController {
                 
                 let messageId = snapshot.key
                 
-                let messageRef = FIRDatabase.database().reference().child("messages").child(messageId)
+                self.fetchMessageWithMessageId(messageId: messageId)
                 
-                messageRef.observeSingleEvent(of: .value, with: { (messageSnapshot) in
-                    
-                    if let dic = messageSnapshot.value as? [String: Any] {
-                        
-                        let message = Message()
-                        
-                        message.setValuesForKeys(dic)
-                        
-                        // self.messages.append(message)
-                        
-                        //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
-                        if let chatPartnerId = message.chatPartnerId() {
-                            self.messagesDictionary[chatPartnerId] = message
-                        }
-                        
-                        self.attemptReloadOfTable()
-                    }
-                })
             }, withCancel: nil)
         }, withCancel: nil)
     }
-    var timer: Timer?
+    
+    private func fetchMessageWithMessageId(messageId: String) {
+        let messageRef = FIRDatabase.database().reference().child("messages").child(messageId)
+        
+        messageRef.observeSingleEvent(of: .value, with: { (messageSnapshot) in
+            
+            if let dic = messageSnapshot.value as? [String: Any] {
+                
+                let message = Message()
+                
+                message.setValuesForKeys(dic)
+                
+                // self.messages.append(message)
+                
+                //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
+                if let chatPartnerId = message.chatPartnerId() {
+                    self.messagesDictionary[chatPartnerId] = message
+                }
+                
+                self.attemptReloadOfTable()
+            }
+        })
+    }
     
     private func attemptReloadOfTable() {
         //tableView reloadを無効化
@@ -110,7 +114,6 @@ class MessageController: UITableViewController {
         } else {
             fetchUserAndSetupNavBarTitle()
         }
-        
     }
     
     func fetchUserAndSetupNavBarTitle() {
@@ -126,7 +129,6 @@ class MessageController: UITableViewController {
                 user.setValuesForKeys(dictionary)
                 
                 self.setupNavBarWithUser(user: user)
-                
             }
         })
     }

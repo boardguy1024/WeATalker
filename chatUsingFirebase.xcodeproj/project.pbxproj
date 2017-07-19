@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		A225BB7F1EF57C5B00BA2198 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A225BB7E1EF57C5B00BA2198 /* AppDelegate.swift */; };
 		A225BB811EF57C5B00BA2198 /* MessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A225BB801EF57C5B00BA2198 /* MessageController.swift */; };
-		A225BB861EF57C5B00BA2198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A225BB851EF57C5B00BA2198 /* Assets.xcassets */; };
 		A225BB891EF57C5B00BA2198 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A225BB871EF57C5B00BA2198 /* LaunchScreen.storyboard */; };
 		A225BB921EF584A500BA2198 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A225BB911EF584A500BA2198 /* LoginViewController.swift */; };
 		A225BB961EF6BDA800BA2198 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A225BB951EF6BDA800BA2198 /* GoogleService-Info.plist */; };
@@ -22,6 +21,7 @@
 		A29042F11F080DF600BEBA4E /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29042F01F080DF600BEBA4E /* ChatLogController.swift */; };
 		A290AF981F1A5B1200F22EF0 /* ChatMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A290AF971F1A5B1200F22EF0 /* ChatMessageCell.swift */; };
 		A290AF9A1F1B4C3500F22EF0 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = A290AF991F1B4C3500F22EF0 /* Constant.swift */; };
+		A290AF9C1F1EF4EE00F22EF0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A290AF9B1F1EF4EE00F22EF0 /* Assets.xcassets */; };
 		B9721E355FB794175943C489 /* Pods_chatUsingFirebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 747055ED63CCCA01ABCA13E5 /* Pods_chatUsingFirebase.framework */; };
 /* End PBXBuildFile section */
 
@@ -32,7 +32,6 @@
 		A225BB7B1EF57C5B00BA2198 /* chatUsingFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = chatUsingFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A225BB7E1EF57C5B00BA2198 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A225BB801EF57C5B00BA2198 /* MessageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageController.swift; sourceTree = "<group>"; };
-		A225BB851EF57C5B00BA2198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A225BB881EF57C5B00BA2198 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A225BB8A1EF57C5B00BA2198 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A225BB911EF584A500BA2198 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -46,6 +45,7 @@
 		A29042F01F080DF600BEBA4E /* ChatLogController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
 		A290AF971F1A5B1200F22EF0 /* ChatMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatMessageCell.swift; sourceTree = "<group>"; };
 		A290AF991F1B4C3500F22EF0 /* Constant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
+		A290AF9B1F1EF4EE00F22EF0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,8 +100,8 @@
 			children = (
 				A225BB951EF6BDA800BA2198 /* GoogleService-Info.plist */,
 				A225BB901EF5849000BA2198 /* Controller */,
+				A290AF9B1F1EF4EE00F22EF0 /* Assets.xcassets */,
 				A225BB7E1EF57C5B00BA2198 /* AppDelegate.swift */,
-				A225BB851EF57C5B00BA2198 /* Assets.xcassets */,
 				A225BB871EF57C5B00BA2198 /* LaunchScreen.storyboard */,
 				A225BB8A1EF57C5B00BA2198 /* Info.plist */,
 			);
@@ -214,8 +214,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A225BB891EF57C5B00BA2198 /* LaunchScreen.storyboard in Resources */,
+				A290AF9C1F1EF4EE00F22EF0 /* Assets.xcassets in Resources */,
 				A225BB961EF6BDA800BA2198 /* GoogleService-Info.plist in Resources */,
-				A225BB861EF57C5B00BA2198 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

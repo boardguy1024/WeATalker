@@ -16,6 +16,8 @@ class Message: NSObject {
     var timeStamp: NSNumber?
     var toId: String?
     
+    var imageUrl: String?
+    
     func chatPartnerId() -> String? {
         
         //現在ログイン中のcurrentUser.uid と 取得したmessageのfromIdが一致した場合のみ、message.toidをセットする

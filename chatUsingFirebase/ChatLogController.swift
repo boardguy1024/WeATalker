@@ -9,7 +9,8 @@
 import UIKit
 import Firebase
 
-class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICollectionViewDelegateFlowLayout {
+class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICollectionViewDelegateFlowLayout,
+UINavigationControllerDelegate , UIImagePickerControllerDelegate {
     
     let cellId = "cellId"
     
@@ -49,7 +50,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
                 DispatchQueue.main.async {
                     self.collectionView?.reloadData()
                 }
-
+                
             }, withCancel: nil)
             
         }, withCancel: nil)
@@ -75,8 +76,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         //keyboardの操作をinterectivityする
         collectionView?.keyboardDismissMode = .interactive
-        //
-        //        setupInputComponent()
+        
         //
         //        setupKeyboardObservers()
     }
@@ -90,6 +90,21 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         separatorView.translatesAutoresizingMaskIntoConstraints = false
         separatorView.backgroundColor = .lightGray
         containerView.addSubview(separatorView)
+        
+        let uploadImageView = UIImageView()
+        uploadImageView.image = UIImage(named: "image.png")
+        uploadImageView.contentMode = .scaleAspectFit
+        uploadImageView.tintColor = .lightGray
+        uploadImageView.translatesAutoresizingMaskIntoConstraints = false
+        uploadImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleUploadTap)))
+        uploadImageView.isUserInteractionEnabled = true
+        containerView.addSubview(uploadImageView)
+        
+        //constraint
+        uploadImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 8).isActive = true
+        uploadImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        uploadImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        uploadImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
         //constraint
         separatorView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
@@ -113,13 +128,100 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         containerView.addSubview(self.inputTextfield)
         
         //constraint
-        self.inputTextfield.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 8).isActive = true
+        self.inputTextfield.leftAnchor.constraint(equalTo: uploadImageView.rightAnchor, constant: 8).isActive = true
         self.inputTextfield.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
         self.inputTextfield.rightAnchor.constraint(equalTo: sendButton.leftAnchor).isActive = true
         self.inputTextfield.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
         
         return containerView
     }()
+    
+    func handleUploadTap() {
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.allowsEditing = true
+        imagePickerController.delegate = self
+        present(imagePickerController, animated: true, completion: nil)
+    }
+    
+    
+    //MARK: -UIPickerView Delegate Methods
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        
+        var selectedImageFromPicker: UIImage?
+        
+        if let editedImage = info["UIImagePickerControllerEditedImage"] as? UIImage {
+            selectedImageFromPicker = editedImage
+        } else if let originalImage = info["UIImagePickerControllerOriginalImage"] as? UIImage {
+            selectedImageFromPicker = originalImage
+        }
+        
+        if let selectedImage = selectedImageFromPicker {
+            uploadToFirebaseStorageUsingImage(image: selectedImage)
+        }
+        dismiss(animated: true, completion: nil)
+        
+        print("We selected an image!!")
+    }
+    
+    //選択したイメージをFirebaseのストレージに保存する
+    private func uploadToFirebaseStorageUsingImage(image: UIImage) {
+        
+        let imageName = NSUUID().uuidString
+        let ref = FIRStorage.storage().reference().child("message-images").child(imageName)
+        
+        if let uploadData = UIImageJPEGRepresentation(image, 0.2) {
+            ref.put(uploadData, metadata: nil, completion: { (metaData, error) in
+                
+                if error != nil {
+                    print("Failed to upload image " , error!)
+                    return
+                }
+                
+                //storageに保存したimageのurlを取得
+                if let imageUrl = metaData?.downloadURL()?.absoluteString {
+                    self.sendMessageWithImageUrl(imageUrl: imageUrl)
+                }
+            })
+        }
+    }
+    
+    private func sendMessageWithImageUrl(imageUrl: String) {
+        let ref = FIRDatabase.database().reference().child("messages")
+        //messageの中に chileの uidを生成
+        let childRef = ref.childByAutoId()
+        //相手Userのuidを取得
+        guard let toId = user?.id else { return }
+        //LoginUserのuidを取得
+        guard let fromId = FIRAuth.auth()?.currentUser?.uid else { return }
+        
+        let timeStamp = String(Date().timeIntervalSince1970)
+        let values = ["imageUrl": imageUrl, "toId": toId , "fromId": fromId, "timeStamp": timeStamp]
+        
+        childRef.updateChildValues(values) { (error, ref) in
+            
+            if error != nil {
+                print(error!)
+                return
+            }
+            
+            let messageId = childRef.key
+            //送信者
+            //送信するメッセージValueを user-messageの中に送信者uid名でdatabaseにUpdateする。
+            let userMessageRef =  FIRDatabase.database().reference().child("user-messages").child(fromId).child(toId)
+            userMessageRef.updateChildValues([messageId: 1])
+            
+            //受信者
+            //送信するメッセージValueを user-messageの中に受信者uid名でdatabaseにUpdateする。
+            let recipientMessageRef = FIRDatabase.database().reference().child("user-messages").child(toId).child(fromId)
+            recipientMessageRef.updateChildValues([messageId: 1])
+            
+        }
+        
+    }
     
     //UIViewControllerのpropertyの一つ
     //keyBoardの上部に追加できるaccessoryView
@@ -172,22 +274,6 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     }
     
     var containerViewButtomAnchor: NSLayoutConstraint?
-    
-    func setupInputComponent() {
-        
-        let containerView = UIView()
-        containerView.backgroundColor = .white
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(containerView)
-        
-        //constraint
-        containerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        containerViewButtomAnchor = containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        containerViewButtomAnchor?.isActive = true
-        containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        containerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        
-    }
     
     // sendボタンを押下するとメッセージ関連情報をdatabaseにupdateする。
     func handleSend() {
@@ -243,16 +329,21 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         setupCellwithColor(cell: cell, message: message)
         
         //25でwidthを微調整
-        cell.bubbleWidthAnchor?.constant = estimateFrameForText(text: message.text!).width + 25
+        //テキストではなくイメージを送れることになるのでテキストを取得できた場合のみwidthを調整する
+        if let message = message.text {
+            cell.bubbleWidthAnchor?.constant = estimateFrameForText(text: message).width + 25
+        }
         
         return cell
     }
     
+    //cellをセットする
     private func setupCellwithColor(cell: ChatMessageCell, message: Message) {
         
         if let profileImageUrl = user?.profileImageUrl {
             cell.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
         }
+        
         if message.fromId == FIRAuth.auth()?.currentUser?.uid {
             
             //自分のメッセージ
@@ -270,7 +361,20 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
             cell.profileImageView.isHidden = false
         }
         
+        //ImageUrlを表示しない時はmessageImageViewを隠す
+        if let messageImageUrl = message.imageUrl {
+            cell.messageImageView.loadImageUsingCacheWithUrlString(urlString: messageImageUrl)
+            cell.messageImageView.isHidden = false
+            cell.bubbleView.backgroundColor = .clear
+        } else {
+            cell.messageImageView.isHidden = true
+            cell.bubbleView.isHidden = false
+        }
+
+        
     }
+    
+    
     
     //MARK:- collectionViewLayoutFlow Delegate Methods
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -303,11 +407,6 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         return true
     }
 }
-
-
-
-
-
 
 
 

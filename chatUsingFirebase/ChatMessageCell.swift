@@ -40,6 +40,15 @@ class ChatMessageCell: UICollectionViewCell {
         return imageView
     }()
     
+    let messageImageView: UIImageView = {
+       let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 16
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+    
     var bubbleWidthAnchor: NSLayoutConstraint?
     var bubbleleftAnchor: NSLayoutConstraint?
     var bubbleRightAnchor: NSLayoutConstraint?
@@ -50,6 +59,15 @@ class ChatMessageCell: UICollectionViewCell {
         addSubview(bubbleView)
         addSubview(textView)
         addSubview(profileImageView)
+        
+        //送受信するイメージをbubbleViewにattempt
+        bubbleView.addSubview(messageImageView)
+        
+        //messageImageView constraint
+        messageImageView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor).isActive = true
+        messageImageView.topAnchor.constraint(equalTo: bubbleView.topAnchor).isActive = true
+        messageImageView.widthAnchor.constraint(equalTo: bubbleView.widthAnchor).isActive = true
+        messageImageView.heightAnchor.constraint(equalTo: bubbleView.heightAnchor).isActive = true
         
         //bubbleView constraint
         bubbleleftAnchor = bubbleView.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8)
