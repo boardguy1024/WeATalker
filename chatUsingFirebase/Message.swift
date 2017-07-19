@@ -18,9 +18,26 @@ class Message: NSObject {
     
     var imageUrl: String?
     
+    var imageHeight: NSNumber?
+    var imageWidth: NSNumber?
+    
     func chatPartnerId() -> String? {
         
         //現在ログイン中のcurrentUser.uid と 取得したmessageのfromIdが一致した場合のみ、message.toidをセットする
         return  fromId == FIRAuth.auth()?.currentUser?.uid ? toId : fromId
        }
+    
+    init(dictionary: [String: Any]) {
+        super.init()
+        
+        fromId = dictionary["fromId"] as? String
+        text = dictionary["text"] as? String
+        timeStamp = dictionary["timeStamp"] as? NSNumber
+        toId = dictionary["toId"] as? String
+        
+        imageUrl = dictionary["imageUrl"] as? String
+        imageWidth = dictionary["imageWidth"] as? NSNumber
+        imageHeight = dictionary["imageHeight"] as? NSNumber
+        
+    }
 }

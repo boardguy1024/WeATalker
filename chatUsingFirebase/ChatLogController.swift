@@ -42,10 +42,8 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
                 
                 guard let dictionary = messageSnapshot.value as? [String: Any] else { return }
                 
-                let message = Message()
-                message.setValuesForKeys(dictionary)
-                
-                self.messages.append(message)
+                self.messages.append(Message(dictionary: dictionary)
+                )
                 
                 DispatchQueue.main.async {
                     self.collectionView?.reloadData()
@@ -183,13 +181,14 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
                 
                 //storageに保存したimageのurlを取得
                 if let imageUrl = metaData?.downloadURL()?.absoluteString {
-                    self.sendMessageWithImageUrl(imageUrl: imageUrl)
+                    self.sendMessageWithImageUrl(imageUrl: imageUrl, image: image)
                 }
             })
         }
     }
     
-    private func sendMessageWithImageUrl(imageUrl: String) {
+    
+    private func sendMessageWithImageUrl(imageUrl: String , image: UIImage) {
         let ref = FIRDatabase.database().reference().child("messages")
         //messageの中に chileの uidを生成
         let childRef = ref.childByAutoId()
@@ -199,7 +198,8 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         guard let fromId = FIRAuth.auth()?.currentUser?.uid else { return }
         
         let timeStamp = String(Date().timeIntervalSince1970)
-        let values = ["imageUrl": imageUrl, "toId": toId , "fromId": fromId, "timeStamp": timeStamp]
+        let values = ["toId": toId , "fromId": fromId, "timeStamp": timeStamp,
+                      "imageUrl": imageUrl, "imageWidth": image.size.width, "imageHeight": image.size.height] as [String : Any]
         
         childRef.updateChildValues(values) { (error, ref) in
             
@@ -332,6 +332,8 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         //テキストではなくイメージを送れることになるのでテキストを取得できた場合のみwidthを調整する
         if let message = message.text {
             cell.bubbleWidthAnchor?.constant = estimateFrameForText(text: message).width + 25
+        } else if message.imageUrl != nil {
+            cell.bubbleWidthAnchor?.constant = 200
         }
         
         return cell
@@ -370,7 +372,7 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
             cell.messageImageView.isHidden = true
             cell.bubbleView.isHidden = false
         }
-
+        
         
     }
     
@@ -380,8 +382,20 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         var height: CGFloat = 80
-        if let text = messages[indexPath.row].text {
+        
+        let message = messages[indexPath.row]
+        
+        //テキストの場合
+        if let text = message.text {
             height = estimateFrameForText(text: text).height + 20
+            
+        //イメージの場合、
+        } else if let imageWidth = message.imageWidth?.floatValue, let imageHeight = message.imageHeight?.floatValue {
+            
+            // h1 / w1 == h2 / w2
+            // h1 == h2 / w2 * w1
+            // width 200固定の比率で高さをestimateする
+            height = CGFloat(imageHeight / imageWidth * 200)
         }
         
         //view.frame.widthを使用するとdevice向きが変わってもこの値は変わらないので吹き出し位置が崩れてしまう。

@@ -61,12 +61,8 @@ class MessageController: UITableViewController {
             
             if let dic = messageSnapshot.value as? [String: Any] {
                 
-                let message = Message()
-                
-                message.setValuesForKeys(dic)
-                
-                // self.messages.append(message)
-                
+                let message = Message(dictionary: dic)
+                                
                 //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
                 if let chatPartnerId = message.chatPartnerId() {
                     self.messagesDictionary[chatPartnerId] = message
