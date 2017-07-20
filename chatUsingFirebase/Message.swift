@@ -13,7 +13,7 @@ class Message: NSObject {
 
     var fromId: String?
     var text: String?
-    var timeStamp: NSNumber?
+    var timeStamp: String?
     var toId: String?
     
     var imageUrl: String?
@@ -32,7 +32,7 @@ class Message: NSObject {
         
         fromId = dictionary["fromId"] as? String
         text = dictionary["text"] as? String
-        timeStamp = dictionary["timeStamp"] as? NSNumber
+        timeStamp = dictionary["timeStamp"] as? String
         toId = dictionary["toId"] as? String
         
         imageUrl = dictionary["imageUrl"] as? String

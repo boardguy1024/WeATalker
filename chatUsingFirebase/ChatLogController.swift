@@ -47,6 +47,10 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
                 
                 DispatchQueue.main.async {
                     self.collectionView?.reloadData()
+                    //Index path for scroll to the last index
+                    let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
+                    //scroll positionはbottomに設定
+                    self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
                 }
                 
             }, withCancel: nil)
@@ -75,8 +79,8 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         //keyboardの操作をinterectivityする
         collectionView?.keyboardDismissMode = .interactive
         
-        //
-        //        setupKeyboardObservers()
+        //keyboardのobserverを設定
+        setupKeyboardObservers()
     }
     
     lazy var inputContainerView: UIView = {
@@ -214,27 +218,18 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         NotificationCenter.default.removeObserver(self)
     }
     
+    //キーボードにObserverを追加
+    //最後のメッセージに自動スクロールさせる
     private func setupKeyboardObservers() {
         
-        //メッセージ送信欄の位置をキーボードの上に動的に表示するためにnotificationを登録
-        NotificationCenter.default.addObserver(self, selector: #selector(handlekeyboardWillShow), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handlekeyboardWillHide), name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handlekeyboardDidShow), name: .UIKeyboardDidShow, object: nil)
     }
     
-    func handlekeyboardWillShow(notification: Notification) {
-        guard let keyboardFrame = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect else { return }
-        guard let keyboardDuration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? Double else { return }
-        containerViewButtomAnchor?.constant = -keyboardFrame.height
-        UIView.animate(withDuration: keyboardDuration) {
-            self.view.layoutIfNeeded()
-        }
+    func handlekeyboardDidShow() {
         
-    }
-    func handlekeyboardWillHide(notification: Notification) {
-        guard let keyboardDuration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? Double else { return }
-        containerViewButtomAnchor?.constant = 0
-        UIView.animate(withDuration: keyboardDuration) {
-            self.view.layoutIfNeeded()
+        if messages.count > 0 {
+            let indexPath = IndexPath(item: messages.count - 1, section: 0)
+            self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
         }
     }
     
@@ -373,7 +368,7 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         if let text = message.text {
             height = estimateFrameForText(text: text).height + 20
             
-        //イメージの場合、
+            //イメージの場合、
         } else if let imageWidth = message.imageWidth?.floatValue, let imageHeight = message.imageHeight?.floatValue {
             
             // h1 / w1 == h2 / w2

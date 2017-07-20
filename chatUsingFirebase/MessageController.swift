@@ -62,7 +62,7 @@ class MessageController: UITableViewController {
             if let dic = messageSnapshot.value as? [String: Any] {
                 
                 let message = Message(dictionary: dic)
-                                
+                
                 //各セルにユーザーが重複されないように制御（結果的に各ユーザーは最後のメッセージを表示することになる）
                 if let chatPartnerId = message.chatPartnerId() {
                     self.messagesDictionary[chatPartnerId] = message
@@ -80,8 +80,13 @@ class MessageController: UITableViewController {
         //(intervalによって少し変動)
         self.timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(self.handleReloadTableView), userInfo: nil, repeats: false)
         self.messages = Array(self.messagesDictionary.values)
+        
         self.messages.sort(by: { (message1, message2) -> Bool in
-            return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
+          
+            if let timeStamp1 = message1.timeStamp, let timeStamp2 = message2.timeStamp {
+              return timeStamp1 > timeStamp2
+            }
+            return false
         })
     }
     
