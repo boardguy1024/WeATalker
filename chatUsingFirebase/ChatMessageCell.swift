@@ -10,6 +10,8 @@ import UIKit
 
 class ChatMessageCell: UICollectionViewCell {
     
+    var chatLogController: ChatLogController?
+    
     let textView: UITextView = {
     
         let tv = UITextView()
@@ -41,18 +43,28 @@ class ChatMessageCell: UICollectionViewCell {
         return imageView
     }()
     
-    let messageImageView: UIImageView = {
+    lazy var messageImageView: UIImageView = {
        let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 16
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleZoomTap)))
         return imageView
     }()
     
     var bubbleWidthAnchor: NSLayoutConstraint?
     var bubbleleftAnchor: NSLayoutConstraint?
     var bubbleRightAnchor: NSLayoutConstraint?
+    
+    func handleZoomTap(tapGesture: UITapGestureRecognizer) {
+        
+        guard let tappedImageView = tapGesture.view as? UIImageView else { return }
+        
+        //ChatLogControllerのDelegateメソッドを呼び出す。
+        self.chatLogController?.performZoomInForStaringImageView(startingImageView: tappedImageView)
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)

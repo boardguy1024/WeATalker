@@ -48,9 +48,12 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
                 DispatchQueue.main.async {
                     self.collectionView?.reloadData()
                     //Index path for scroll to the last index
-                    let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
-                    //scroll positionはbottomに設定
-                    self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
+                    if self.messages.count > 0 {
+                        let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
+                        //scroll positionはbottomに設定
+                        self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
+                        
+                    }
                 }
                 
             }, withCancel: nil)
@@ -301,6 +304,8 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
         
+        cell.chatLogController = self
+        
         let message = messages[indexPath.row]
         
         cell.textView.text = message.text
@@ -310,8 +315,10 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         //25でwidthを微調整
         //テキストではなくイメージを送れることになるのでテキストを取得できた場合のみwidthを調整する
         if let message = message.text {
+            cell.textView.isHidden = false
             cell.bubbleWidthAnchor?.constant = estimateFrameForText(text: message).width + 25
         } else if message.imageUrl != nil {
+            cell.textView.isHidden = true
             cell.bubbleWidthAnchor?.constant = 200
         }
         
@@ -398,6 +405,66 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         
         handleSend()
         return true
+    }
+    
+    var startingImageViewFrame: CGRect?
+    var blackBackgroundView: UIView?
+    var startingImageView: UIImageView?
+    //イメージをタップすることでその位置から拡大して表示させる
+    func performZoomInForStaringImageView(startingImageView: UIImageView) {
+        
+        //タップしたimageViewのrectをsuperViewからのrectをreturn
+        startingImageViewFrame = startingImageView.superview?.convert(startingImageView.frame, to: nil)
+        self.startingImageView = startingImageView
+        let zoomingImageView = UIImageView(frame: startingImageViewFrame!)
+        zoomingImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleZoomOut)))
+        zoomingImageView.isUserInteractionEnabled = true
+        zoomingImageView.image = startingImageView.image
+        
+        //keyWindowは最近makeKeyAndVisible ()が呼ばれたWindowsの配列のwindow(要は表示中のUIWindow)
+        //keyWindowは?なので以下にガードをかける
+        if let keyWindow = UIApplication.shared.keyWindow {
+            
+            startingImageView.isHidden = true
+            blackBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: keyWindow.frame.width, height: keyWindow.frame.height))
+            blackBackgroundView?.backgroundColor = .black
+            blackBackgroundView?.alpha = 0
+            keyWindow.addSubview(blackBackgroundView!)
+            keyWindow.addSubview(zoomingImageView)
+            
+            //拡大前の比率で高さを求める
+            let zoomHeight = CGFloat(startingImageView.frame.height / startingImageView.frame.width * keyWindow.frame.width)
+            
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseIn, animations: {
+                
+                self.blackBackgroundView?.alpha = 1
+                self.inputContainerView.alpha = 0
+                zoomingImageView.frame = CGRect(x: 0, y: 0, width: keyWindow.frame.width, height: zoomHeight)
+                zoomingImageView.center = keyWindow.center
+                
+            }, completion: nil)
+        }
+    }
+    
+    func handleZoomOut(tapGesture: UITapGestureRecognizer) {
+        
+        guard let zoomOutImageView = tapGesture.view else { return }
+        zoomOutImageView.layer.cornerRadius = 16
+        zoomOutImageView.clipsToBounds = true
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+            
+            zoomOutImageView.frame = self.startingImageViewFrame!
+            self.blackBackgroundView?.alpha = 0
+            self.inputContainerView.alpha = 1
+            
+        }) { (completed) in
+            
+            //最後に画像を削除
+            zoomOutImageView.removeFromSuperview()
+            self.startingImageView?.isHidden = false
+            
+        }
     }
 }
 
