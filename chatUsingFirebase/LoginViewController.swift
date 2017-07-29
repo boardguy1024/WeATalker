@@ -13,7 +13,6 @@ class LoginViewController: UIViewController {
     
     var messageController: MessageController?
 
-    
     // inputView
     let inputContainerView: UIView = {
         let view = UIView()
@@ -148,15 +147,25 @@ class LoginViewController: UIViewController {
     
     
 
-    //login セグメントを選択した時に呼ばれる
+    //セグメントを選択した時に呼ばれる
     func handleLoginRegisterChange() {
         
         let title = loginRegisterSegmentControl.titleForSegment(at: loginRegisterSegmentControl.selectedSegmentIndex)
         registerButton.setTitle(title, for: .normal)
         
-        //ここにname欄を表示しないように処理
+        //選択によって入力欄の高さを調整
         inputsContainerViewHeightAnchor?.constant =
             loginRegisterSegmentControl.selectedSegmentIndex == 0 ? 100 : 150
+        
+        nameTextfield.text = ""
+        emailTextfield.text = ""
+        passwordTextfield.text = ""
+        
+        if loginRegisterSegmentControl.selectedSegmentIndex == 0 {
+            nameTextfield.isHidden = true
+        } else {
+            nameTextfield.isHidden = false
+        }
         
         //nameTextfield高さを変更
         nameTextfieldHeightAnchor?.isActive = false
@@ -187,6 +196,12 @@ class LoginViewController: UIViewController {
         setRegisterButton()
         setProfileImageView()
         setLogRegisterSegmentControl()
+        
+        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTabScreen)))
+    }
+    
+    func handleTabScreen() {
+        self.view.endEditing(true)
     }
     
     func setLogRegisterSegmentControl() {
@@ -278,7 +293,6 @@ class LoginViewController: UIViewController {
         passwordTextfieldHeightAnchor?.isActive = true
         
         // passwordTextfield *********************************************************************
-        
         
     }
     
