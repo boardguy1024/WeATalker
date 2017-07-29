@@ -15,6 +15,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
 UINavigationControllerDelegate , UIImagePickerControllerDelegate {
     
     let cellId = "cellId"
+    var isFirstShowingChatLogView = true
     
     var user: User? {
         didSet {
@@ -260,10 +261,12 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
     
     func handlekeyboardDidShow() {
         
-        if messages.count > 0 {
-            let indexPath = IndexPath(item: messages.count - 1, section: 0)
-            self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
+        if isFirstShowingChatLogView {
+         //    let indexPath = IndexPath(item: messages.count - 1, section: 0)
+        //     self.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
+         //   isFirstShowingChatLogView = false
         }
+    
     }
     
     //このアプリではlandScapeモードは対応しないが、念のため入れておく

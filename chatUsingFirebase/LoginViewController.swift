@@ -18,11 +18,11 @@ class LoginViewController: UIViewController {
     let inputContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        
+        view.alpha = 0.9
         //基本的にAutoLayoutはTrueになっているためViewのFrame設定しても効かない
         //viewのframeを設定するにはAutoLayoutをfalseする
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 5
+        view.layer.cornerRadius = 15
         view.layer.masksToBounds = true
         return view
     }()
@@ -32,10 +32,10 @@ class LoginViewController: UIViewController {
         let button = UIButton(type: UIButtonType.system)
         button.setTitle("Register", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = UIColor(r: 80, g: 101, b: 161)
+        button.backgroundColor = UIColor(r: 237, g: 167, b: 0)
         button.tintColor = .white
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
-        button.layer.cornerRadius = 7
+        button.layer.cornerRadius = 25
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(handleLoginRegister), for: .touchUpInside)
         
@@ -85,15 +85,18 @@ class LoginViewController: UIViewController {
     let nameTextfield: UITextField = {
         
         let tf = UITextField()
-        tf.placeholder = "Name"
+        tf.attributedPlaceholder =
+            NSAttributedString(string:"Name", attributes:[NSForegroundColorAttributeName: UIColor.init(r: 130, g: 220, b: 220),NSFontAttributeName :UIFont(name: "Arial", size: 16)!])
+
         tf.returnKeyType = .done
+        tf.textColor = greenColor
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
     }()
     
     let nameSeparatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(r: 220, g: 220, b: 220)
+        view.backgroundColor = UIColor.init(r: 130, g: 220, b: 220)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -102,7 +105,9 @@ class LoginViewController: UIViewController {
     let emailTextfield: UITextField = {
         
         let tf = UITextField()
-        tf.placeholder = "Email"
+        tf.attributedPlaceholder =
+            NSAttributedString(string:"Email", attributes:[NSForegroundColorAttributeName: UIColor.init(r: 130, g: 220, b: 220),NSFontAttributeName :UIFont(name: "Arial", size: 16)!])
+        tf.textColor = greenColor
         tf.returnKeyType = .done
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
@@ -110,7 +115,7 @@ class LoginViewController: UIViewController {
     
     let emailSeparatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(r: 220, g: 220, b: 220)
+        view.backgroundColor = UIColor.init(r: 130, g: 220, b: 220)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -119,7 +124,10 @@ class LoginViewController: UIViewController {
     let passwordTextfield: UITextField = {
         
         let tf = UITextField()
-        tf.placeholder = "Password"
+        tf.attributedPlaceholder =
+            NSAttributedString(string:"Password", attributes:[NSForegroundColorAttributeName: UIColor.init(r: 130, g: 220, b: 220),NSFontAttributeName :UIFont(name: "Arial", size: 16)!])
+
+        tf.textColor = greenColor
         tf.returnKeyType = .done
         tf.isSecureTextEntry = true
         tf.translatesAutoresizingMaskIntoConstraints = false
@@ -128,23 +136,43 @@ class LoginViewController: UIViewController {
     
     let passwordSeparatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(r: 220, g: 220, b: 220)
+        view.backgroundColor = UIColor.init(r: 130, g: 220, b: 220)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     
+    let logoImageview: UIImageView = {
+       
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "logo.png")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
     lazy var profileImageView: UIImageView = {
         
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "login")
+        imageView.image = UIImage(named: "profile.png")
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.tintColor = .white
         //タブジェスチャーを追加する
         imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleSelectProfileImageView)))
-        
         imageView.isUserInteractionEnabled = true
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 75
+        imageView.layer.masksToBounds = true
+        imageView.isHidden = true
         
+        return imageView
+    }()
+    
+    let backgroundImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "background.jpg")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
@@ -153,12 +181,14 @@ class LoginViewController: UIViewController {
         let sc = UISegmentedControl(items: ["Login","Register"])
         sc.translatesAutoresizingMaskIntoConstraints = false
         sc.tintColor = .white
-        sc.selectedSegmentIndex = 1
+        sc.selectedSegmentIndex = 0
+        sc.layer.cornerRadius = 15
+        sc.layer.masksToBounds = true
+        sc.layer.borderWidth = 1
+        sc.layer.borderColor = UIColor.white.cgColor
         sc.addTarget(self, action: #selector(handleLoginRegisterChange), for: .valueChanged)
         return sc
     }()
-    
-    
     
     //セグメントを選択した時に呼ばれる
     func handleLoginRegisterChange() {
@@ -166,18 +196,32 @@ class LoginViewController: UIViewController {
         let title = loginRegisterSegmentControl.titleForSegment(at: loginRegisterSegmentControl.selectedSegmentIndex)
         registerButton.setTitle(title, for: .normal)
         
-        //選択によって入力欄の高さを調整
-        inputsContainerViewHeightAnchor?.constant =
-            loginRegisterSegmentControl.selectedSegmentIndex == 0 ? 100 : 150
-        
         nameTextfield.text = ""
         emailTextfield.text = ""
         passwordTextfield.text = ""
         
+        //選択によって入力欄の高さを調整
         if loginRegisterSegmentControl.selectedSegmentIndex == 0 {
+            inputsContainerViewHeightAnchor?.constant = 100
             nameTextfield.isHidden = true
+            logoImageview.isHidden = false
+            profileImageView.isHidden = true
+            logoImageview.transform = CGAffineTransform(scaleX: 0.3, y: 2)
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.3, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
+                
+                self.logoImageview.transform = CGAffineTransform.identity
+            }, completion: nil)
         } else {
+            inputsContainerViewHeightAnchor?.constant = 150
             nameTextfield.isHidden = false
+            logoImageview.isHidden = true
+            profileImageView.isHidden = false
+            profileImageView.transform = CGAffineTransform(scaleX: 0.3, y: 2)
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.3, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
+                
+                self.profileImageView.transform = CGAffineTransform.identity
+            }, completion: nil)
+
         }
         
         //nameTextfield高さを変更
@@ -201,23 +245,33 @@ class LoginViewController: UIViewController {
         nameTextfield.delegate = self
         emailTextfield.delegate = self
         passwordTextfield.delegate = self
-        
-        view.backgroundColor = UIColor(r: 61, g: 91, b: 151)
+        view.addSubview(backgroundImageView)
         view.addSubview(inputContainerView)
         view.addSubview(registerButton)
         view.addSubview(profileImageView)
         view.addSubview(loginRegisterSegmentControl)
+        view.addSubview(logoImageview)
         
+        setBackgroundImageView ()
         setInputContainerView()
         setRegisterButton()
         setProfileImageView()
         setLogRegisterSegmentControl()
+        setLogoImageView()
+        
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTabScreen)))
     }
     
     func handleTabScreen() {
         self.view.endEditing(true)
+    }
+
+    func setBackgroundImageView() {
+        backgroundImageView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        backgroundImageView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        backgroundImageView.heightAnchor.constraint(equalTo: view.heightAnchor).isActive = true
     }
     
     func setLogRegisterSegmentControl() {
@@ -234,6 +288,12 @@ class LoginViewController: UIViewController {
         profileImageView.heightAnchor.constraint(equalToConstant: 150).isActive = true
     }
     
+    func setLogoImageView() {
+        logoImageview.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        logoImageview.bottomAnchor.constraint(lessThanOrEqualTo: loginRegisterSegmentControl.topAnchor, constant: -50).isActive = true
+        logoImageview.widthAnchor.constraint(equalToConstant: 370).isActive = true
+        logoImageview.heightAnchor.constraint(equalToConstant: 120).isActive = true
+    }
     
     var inputsContainerViewHeightAnchor: NSLayoutConstraint?
     var nameTextfieldHeightAnchor: NSLayoutConstraint?
