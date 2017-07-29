@@ -8,6 +8,8 @@
 
 import UIKit
 import Firebase
+import MobileCoreServices
+import AVFoundation
 
 class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICollectionViewDelegateFlowLayout,
 UINavigationControllerDelegate , UIImagePickerControllerDelegate {
@@ -38,13 +40,16 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
             let messageId = snapshot.key
             let messageRef = FIRDatabase.database().reference().child("messages").child(messageId)
             
+            //FIRDataEventTypeを.Valueにすることにより、なにかしらの変化があった時に、実行しCollectionViewをReload
             messageRef.observeSingleEvent(of: .value, with: { (messageSnapshot) in
                 
                 guard let dictionary = messageSnapshot.value as? [String: Any] else { return }
                 
+                //updateされたメッセージをDatabaseから取得し、messegeにappend
                 self.messages.append(Message(dictionary: dictionary)
                 )
                 
+                //collectionView更新
                 DispatchQueue.main.async {
                     self.collectionView?.reloadData()
                     //Index path for scroll to the last index
@@ -145,6 +150,8 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         let imagePickerController = UIImagePickerController()
         imagePickerController.allowsEditing = true
         imagePickerController.delegate = self
+        imagePickerController.mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
+        
         present(imagePickerController, animated: true, completion: nil)
     }
     
@@ -156,6 +163,29 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
+        //Movie選択
+        if let videoUrl = info[UIImagePickerControllerMediaURL] as? URL {
+            print("movie file url: \(videoUrl)")
+            
+            let fileName = "someFileName.mov"
+            FIRStorage.storage().reference().child(fileName).putFile(videoUrl, metadata: nil, completion: { (metadata, error) in
+                
+                if error != nil {
+                    print(error!)
+                    return
+                }
+                
+                if let storageUrl = metadata?.downloadURL()?.absoluteString {
+                    print(storageUrl)
+                }
+            })
+            
+            
+            return
+        }
+        
+        
+        //イメージ選択
         var selectedImageFromPicker: UIImage?
         
         if let editedImage = info["UIImagePickerControllerEditedImage"] as? UIImage {
@@ -433,7 +463,7 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
             keyWindow.addSubview(zoomingImageView)
             
             //拡大前の比率で高さを求める
-            let zoomHeight = CGFloat(startingImageView.frame.height / startingImageView.frame.width * keyWindow.frame.width)
+            let zoomHeight = CGFloat((startingImageView.frame.height / startingImageView.frame.width) * keyWindow.frame.width)
             
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseIn, animations: {
                 

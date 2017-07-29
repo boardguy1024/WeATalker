@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import SVProgressHUD
 
 extension LoginViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
@@ -20,11 +21,14 @@ extension LoginViewController : UIImagePickerControllerDelegate, UINavigationCon
             return
         }
         
+        SVProgressHUD.show()
         //ユーザー登録が完了するとUIDが取得できる
         FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { (user, error) in
             
+            SVProgressHUD.dismiss()
             if error != nil {
                 print(error!)
+                SVProgressHUD.dismiss()
                 return
             }
             guard let uid = user?.uid else {
