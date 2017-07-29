@@ -19,7 +19,10 @@ class MessageController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.navigationBar.barTintColor = greenColor
+        navigationController?.navigationBar.barTintColor = ubanBlueColor
+        navigationController?.navigationBar.tintColor = .white
+        let customFont = UIFont(name: "Chalkboard SE", size: 17.0)!
+        UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName: customFont], for: .normal)
         
         //Logoutボタンを左上に配置
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
@@ -68,7 +71,6 @@ class MessageController: UITableViewController {
                 if let chatPartnerId = message.chatPartnerId() {
                     self.messagesDictionary[chatPartnerId] = message
                 }
-                
                 self.attemptReloadOfTable()
             }
         })
@@ -100,10 +102,18 @@ class MessageController: UITableViewController {
     
     func handleNewMessage() {
         
-        let newMessageController = NewMessageController()
+   
+        // レイアウト作成
+        let flowLayout = UICollectionViewFlowLayout()
+        
+        let cellSize = view.frame.width / 2 - 5.0
+        flowLayout.itemSize = CGSize(width: cellSize , height: cellSize)
+        
+        let newMessageController = NewMessageController(collectionViewLayout: flowLayout)
         
         newMessageController.messageController = self
         
+        //self.navigationController?.pushViewController(newMessageController, animated: true)
         let navController = UINavigationController.init(rootViewController: newMessageController)
         present(navController, animated: true, completion: nil)
     }
@@ -167,15 +177,17 @@ class MessageController: UITableViewController {
         profileImageView.layer.cornerRadius = 20
         profileImageView.layer.masksToBounds = true
         
-        let nameLable = UILabel()
-        nameLable.text = user.name
-        nameLable.translatesAutoresizingMaskIntoConstraints = false
-        containerView.addSubview(nameLable)
+        let nameLabel = UILabel()
+        nameLabel.text = user.name
+        nameLabel.textColor = .white
+        nameLabel.font = UIFont(name: "Chalkboard SE", size: 25)
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(nameLabel)
         
-        nameLable.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8).isActive = true
-        nameLable.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
-        nameLable.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
-        nameLable.heightAnchor.constraint(equalTo: profileImageView.heightAnchor).isActive = true
+        nameLabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8).isActive = true
+        nameLabel.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
+        nameLabel.heightAnchor.constraint(equalTo: profileImageView.heightAnchor).isActive = true
         
         containerView.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
         containerView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
@@ -195,9 +207,7 @@ class MessageController: UITableViewController {
         
         chatLogController.user = user
         self.navigationController?.pushViewController(chatLogController, animated: true)
-        
     }
-    
     
     func handleLogout() {
         
@@ -245,8 +255,6 @@ class MessageController: UITableViewController {
             user.setValuesForKeys(dictionary)
             
             self.showChatController(user: user)
-            
-            
             
         }, withCancel: nil)
         

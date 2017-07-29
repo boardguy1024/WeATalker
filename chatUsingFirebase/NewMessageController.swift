@@ -9,21 +9,41 @@
 import UIKit
 import Firebase
 
-class NewMessageController: UITableViewController {
+class NewMessageController: UICollectionViewController , UICollectionViewDelegateFlowLayout , UINavigationControllerDelegate {
     
     let cellId = "cellId"
     var users = [User]()
+    var messageController: MessageController?
+    
+    let backgroundImageView: UIImageView = {
+       
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "new_background.jpg")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.barTintColor = greenColor
+        collectionView?.backgroundView = backgroundImageView
+        setBackgroundImageView()
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(handleCancel))
+        navigationController?.navigationBar.barTintColor = ubanBlueColor
+        navigationController?.navigationBar.tintColor = .white
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "< Back", style: .plain, target: self, action: #selector(handleCancel))
         
-        tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
+        collectionView?.register(UserCollectionCell.self, forCellWithReuseIdentifier: cellId)
         
         fetchUser()
+    }
+    
+    func setBackgroundImageView() {
+        backgroundImageView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        backgroundImageView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        backgroundImageView.heightAnchor.constraint(equalTo: view.heightAnchor).isActive = true
     }
     
     //DBにあるUser情報を取得する
@@ -38,36 +58,30 @@ class NewMessageController: UITableViewController {
                 user.setValuesForKeys(dic)
                 self.users.append(user)
                 
-                // users 모델에 퓃치한 데이터를 때려박을때마다 테이블 뷰를 리로드 한다.
-                // 그런데 여기는 메인스레드가 아니다 그러므로 크래쉬가 일어난다.
-                //self.tableView.reloadData()
-                
                 DispatchQueue.main.async {
                     
-                    self.tableView.reloadData()
+                    self.collectionView?.reloadData()
                 }
             }
         })
-        
-        
     }
     
     func handleCancel() {
         dismiss(animated: true, completion: nil)
     }
     
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    //MARK:- collectionView Delegate Methods
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return users.count
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! UserCell
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! UserCollectionCell
         let user = users[indexPath.row]
         
-        cell.textLabel?.text = user.name
-        cell.detailTextLabel?.text = user.email
+        cell.nameLabel.text = user.name
+       // cell.detailTextLabel?.text = user.email
         
         
         if let profileImageUrl = user.profileImageUrl {
@@ -78,26 +92,19 @@ class NewMessageController: UITableViewController {
             
         }
         return cell
+
     }
     
-    var messageController: MessageController?
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        self.dismiss(animated: true) { 
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.dismiss(animated: true) {
             
             let user = self.users[indexPath.row]
-
+            
             //chatControllerを表示させる。
             self.messageController?.showChatController(user: user)
-            
         }
     }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 90
-    }
-}
+ }
 
 
 

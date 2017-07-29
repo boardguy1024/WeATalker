@@ -34,7 +34,7 @@ class LoginViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = UIColor(r: 237, g: 167, b: 0)
         button.tintColor = .white
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+        button.titleLabel?.font = UIFont(name: "Chalkboard SE", size: 20)
         button.layer.cornerRadius = 25
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(handleLoginRegister), for: .touchUpInside)
@@ -86,18 +86,20 @@ class LoginViewController: UIViewController {
         
         let tf = UITextField()
         tf.attributedPlaceholder =
-            NSAttributedString(string:"Name", attributes:[NSForegroundColorAttributeName: UIColor.init(r: 130, g: 220, b: 220),NSFontAttributeName :UIFont(name: "Arial", size: 16)!])
-
+            NSAttributedString(string:"Name", attributes:[NSForegroundColorAttributeName: lightBlueColor,NSFontAttributeName :UIFont(name: "Chalkboard SE", size: 16)!])
+        tf.font = UIFont(name: "Chalkboard SE", size: 16)
         tf.returnKeyType = .done
-        tf.textColor = greenColor
+        tf.textColor = ubanBlueColor
         tf.translatesAutoresizingMaskIntoConstraints = false
+        tf.isHidden = true
         return tf
     }()
     
     let nameSeparatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.init(r: 130, g: 220, b: 220)
+        view.backgroundColor = lightBlueColor
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true
         return view
     }()
     
@@ -106,8 +108,10 @@ class LoginViewController: UIViewController {
         
         let tf = UITextField()
         tf.attributedPlaceholder =
-            NSAttributedString(string:"Email", attributes:[NSForegroundColorAttributeName: UIColor.init(r: 130, g: 220, b: 220),NSFontAttributeName :UIFont(name: "Arial", size: 16)!])
-        tf.textColor = greenColor
+            NSAttributedString(string:"Email", attributes:[NSForegroundColorAttributeName: lightBlueColor
+                ,NSFontAttributeName :UIFont(name: "Chalkboard SE", size: 16)!])
+        tf.font = UIFont(name: "Chalkboard SE", size: 16)
+        tf.textColor = ubanBlueColor
         tf.returnKeyType = .done
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
@@ -115,7 +119,7 @@ class LoginViewController: UIViewController {
     
     let emailSeparatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.init(r: 130, g: 220, b: 220)
+        view.backgroundColor = lightBlueColor
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -125,9 +129,10 @@ class LoginViewController: UIViewController {
         
         let tf = UITextField()
         tf.attributedPlaceholder =
-            NSAttributedString(string:"Password", attributes:[NSForegroundColorAttributeName: UIColor.init(r: 130, g: 220, b: 220),NSFontAttributeName :UIFont(name: "Arial", size: 16)!])
-
-        tf.textColor = greenColor
+            NSAttributedString(string:"Password", attributes:[NSForegroundColorAttributeName: lightBlueColor,
+                                                              NSFontAttributeName :UIFont(name: "Chalkboard SE", size: 16)!])
+        tf.font = UIFont(name: "Chalkboard SE", size: 16)
+        tf.textColor = ubanBlueColor
         tf.returnKeyType = .done
         tf.isSecureTextEntry = true
         tf.translatesAutoresizingMaskIntoConstraints = false
@@ -136,7 +141,7 @@ class LoginViewController: UIViewController {
     
     let passwordSeparatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.init(r: 130, g: 220, b: 220)
+        view.backgroundColor = lightBlueColor
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -181,6 +186,7 @@ class LoginViewController: UIViewController {
         let sc = UISegmentedControl(items: ["Login","Register"])
         sc.translatesAutoresizingMaskIntoConstraints = false
         sc.tintColor = .white
+        sc.setTitleTextAttributes([NSFontAttributeName :UIFont(name: "Chalkboard SE", size: 16)!], for: .normal)
         sc.selectedSegmentIndex = 0
         sc.layer.cornerRadius = 15
         sc.layer.masksToBounds = true
@@ -204,6 +210,7 @@ class LoginViewController: UIViewController {
         if loginRegisterSegmentControl.selectedSegmentIndex == 0 {
             inputsContainerViewHeightAnchor?.constant = 100
             nameTextfield.isHidden = true
+            nameSeparatorView.isHidden = true
             logoImageview.isHidden = false
             profileImageView.isHidden = true
             logoImageview.transform = CGAffineTransform(scaleX: 0.3, y: 2)
@@ -214,6 +221,7 @@ class LoginViewController: UIViewController {
         } else {
             inputsContainerViewHeightAnchor?.constant = 150
             nameTextfield.isHidden = false
+            nameSeparatorView.isHidden = false
             logoImageview.isHidden = true
             profileImageView.isHidden = false
             profileImageView.transform = CGAffineTransform(scaleX: 0.3, y: 2)
@@ -258,7 +266,6 @@ class LoginViewController: UIViewController {
         setProfileImageView()
         setLogRegisterSegmentControl()
         setLogoImageView()
-        
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTabScreen)))
     }
@@ -308,7 +315,7 @@ class LoginViewController: UIViewController {
         // width, heightを設定
         inputContainerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 1, constant: -24).isActive = true
         
-        inputsContainerViewHeightAnchor = inputContainerView.heightAnchor.constraint(equalToConstant: 150)
+        inputsContainerViewHeightAnchor = inputContainerView.heightAnchor.constraint(equalToConstant: 100)
         inputsContainerViewHeightAnchor?.isActive = true
         
         inputContainerView.addSubview(nameTextfield)
@@ -325,7 +332,7 @@ class LoginViewController: UIViewController {
         nameTextfield.topAnchor.constraint(equalTo: inputContainerView.topAnchor).isActive = true
         nameTextfield.widthAnchor.constraint(equalTo: inputContainerView.widthAnchor).isActive = true
         
-        nameTextfieldHeightAnchor = nameTextfield.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: 1 / 3)
+        nameTextfieldHeightAnchor = nameTextfield.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: 0)
         nameTextfieldHeightAnchor?.isActive = true
         
         // x, yの座標を設定
@@ -346,7 +353,7 @@ class LoginViewController: UIViewController {
         emailTextfield.widthAnchor.constraint(equalTo: inputContainerView.widthAnchor).isActive = true
         
         
-        emailTextfieldHeightAnchor = emailTextfield.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: 1/3)
+        emailTextfieldHeightAnchor = emailTextfield.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: 1/2)
         emailTextfieldHeightAnchor?.isActive = true
         
         
@@ -365,7 +372,7 @@ class LoginViewController: UIViewController {
         passwordTextfield.leftAnchor.constraint(equalTo: inputContainerView.leftAnchor, constant: 12).isActive = true
         passwordTextfield.topAnchor.constraint(equalTo: emailTextfield.bottomAnchor).isActive = true
         passwordTextfield.widthAnchor.constraint(equalTo: inputContainerView.widthAnchor).isActive = true
-        passwordTextfieldHeightAnchor = passwordTextfield.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: 1/3)
+        passwordTextfieldHeightAnchor = passwordTextfield.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: 1/2)
         passwordTextfieldHeightAnchor?.isActive = true
         
         // passwordTextfield *********************************************************************

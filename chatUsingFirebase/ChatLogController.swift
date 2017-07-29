@@ -27,6 +27,15 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
     
     var messages = [Message]()
     
+    let backgroundImageView: UIImageView = {
+        
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "new_background.jpg")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+
     private func observeMessage() {
         
         guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
@@ -66,10 +75,13 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
             
         }, withCancel: nil)
     }
-    
+
     lazy var inputTextfield: UITextField = {
         let textfield = UITextField()
-        textfield.placeholder = "Enter message..."
+        textfield.attributedPlaceholder =
+            NSAttributedString(string:"Enter message...", attributes:[NSForegroundColorAttributeName: lightBlueColor,
+                                                              NSFontAttributeName :UIFont(name: "Chalkboard SE", size: 16)!])
+
         textfield.translatesAutoresizingMaskIntoConstraints = false
         textfield.delegate = self
         return textfield
@@ -77,6 +89,13 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navigationController?.navigationBar.titleTextAttributes
+            = [NSFontAttributeName: UIFont(name: "Chalkboard SE", size: 16)!]
+        navigationController?.navigationBar.tintColor = .white
+        collectionView?.backgroundView = backgroundImageView
+        
+        setBackgroundImageView()
         
         //セルをtopから8point離す, bottomから60離す
         collectionView?.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
@@ -92,6 +111,13 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         setupKeyboardObservers()
     }
     
+    func setBackgroundImageView() {
+        backgroundImageView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        backgroundImageView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        backgroundImageView.heightAnchor.constraint(equalTo: view.heightAnchor).isActive = true
+    }
+    
     lazy var inputContainerView: UIView = {
         let containerView = UIView()
         containerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50)
@@ -99,13 +125,13 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         
         let separatorView = UIView()
         separatorView.translatesAutoresizingMaskIntoConstraints = false
-        separatorView.backgroundColor = .lightGray
+        separatorView.backgroundColor = ubanBlueColor
         containerView.addSubview(separatorView)
         
         let uploadImageView = UIImageView()
         uploadImageView.image = UIImage(named: "image.png")
         uploadImageView.contentMode = .scaleAspectFit
-        uploadImageView.tintColor = .lightGray
+        uploadImageView.tintColor = lightBlueColor
         uploadImageView.translatesAutoresizingMaskIntoConstraints = false
         uploadImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleUploadTap)))
         uploadImageView.isUserInteractionEnabled = true
