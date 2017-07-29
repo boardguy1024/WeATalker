@@ -280,6 +280,7 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         
         if inputTextfield.text == "" { return }
         
+        
         let value: [String: Any] = ["text": inputTextfield.text!]
         
         sendMessageWithProperies(properies: value)

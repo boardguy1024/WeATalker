@@ -13,7 +13,7 @@ import SVProgressHUD
 class LoginViewController: UIViewController {
     
     var messageController: MessageController?
-
+    
     // inputView
     let inputContainerView: UIView = {
         let view = UIView()
@@ -53,6 +53,11 @@ class LoginViewController: UIViewController {
     
     func handleLogin() {
         
+        //入力バリデーションをチェック
+        if !checkValidInputForLoginOrRegister() {
+            return
+        }
+        
         guard let email = emailTextfield.text, let password = passwordTextfield.text else {
             print("Form is not vaild")
             return
@@ -65,22 +70,23 @@ class LoginViewController: UIViewController {
             
             if error != nil {
                 print(error!)
+                self.showAlertView(title: "ログインに失敗しました", message: "")
                 SVProgressHUD.dismiss()
                 return
             }
-            
             
             self.messageController?.checkIfUserIsLoggedIn()
             
             self.dismiss(animated: true, completion: nil)
         })
     }
-     
+    
     // name 入力欄
     let nameTextfield: UITextField = {
         
         let tf = UITextField()
         tf.placeholder = "Name"
+        tf.returnKeyType = .done
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
     }()
@@ -97,6 +103,7 @@ class LoginViewController: UIViewController {
         
         let tf = UITextField()
         tf.placeholder = "Email"
+        tf.returnKeyType = .done
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
     }()
@@ -113,6 +120,7 @@ class LoginViewController: UIViewController {
         
         let tf = UITextField()
         tf.placeholder = "Password"
+        tf.returnKeyType = .done
         tf.isSecureTextEntry = true
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
@@ -140,9 +148,9 @@ class LoginViewController: UIViewController {
         return imageView
     }()
     
-       lazy var loginRegisterSegmentControl: UISegmentedControl = {
-       
-       let sc = UISegmentedControl(items: ["Login","Register"])
+    lazy var loginRegisterSegmentControl: UISegmentedControl = {
+        
+        let sc = UISegmentedControl(items: ["Login","Register"])
         sc.translatesAutoresizingMaskIntoConstraints = false
         sc.tintColor = .white
         sc.selectedSegmentIndex = 1
@@ -151,7 +159,7 @@ class LoginViewController: UIViewController {
     }()
     
     
-
+    
     //セグメントを選択した時に呼ばれる
     func handleLoginRegisterChange() {
         
@@ -180,18 +188,21 @@ class LoginViewController: UIViewController {
         emailTextfieldHeightAnchor?.isActive = false
         emailTextfieldHeightAnchor = emailTextfield.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: loginRegisterSegmentControl.selectedSegmentIndex == 0 ? 1/2 : 1/3)
         emailTextfieldHeightAnchor?.isActive = true
-
+        
         passwordTextfieldHeightAnchor?.isActive = false
         passwordTextfieldHeightAnchor = passwordTextfield.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: loginRegisterSegmentControl.selectedSegmentIndex == 0 ? 1/2 : 1/3)
         passwordTextfieldHeightAnchor?.isActive = true
-
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor(r: 61, g: 91, b: 151)
+        nameTextfield.delegate = self
+        emailTextfield.delegate = self
+        passwordTextfield.delegate = self
         
+        view.backgroundColor = UIColor(r: 61, g: 91, b: 151)
         view.addSubview(inputContainerView)
         view.addSubview(registerButton)
         view.addSubview(profileImageView)
@@ -223,7 +234,7 @@ class LoginViewController: UIViewController {
         profileImageView.heightAnchor.constraint(equalToConstant: 150).isActive = true
     }
     
- 
+    
     var inputsContainerViewHeightAnchor: NSLayoutConstraint?
     var nameTextfieldHeightAnchor: NSLayoutConstraint?
     var emailTextfieldHeightAnchor: NSLayoutConstraint?
