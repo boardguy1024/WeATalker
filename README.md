@@ -5,4 +5,6 @@
 ## 仕様
 
 ## スクリーンショット
-![header](./backgound.png)
+![header](./backgound1.jpg)
+![header](./backgound2.jpg)
+
