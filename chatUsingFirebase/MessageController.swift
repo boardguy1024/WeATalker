@@ -27,8 +27,16 @@ class MessageController: UITableViewController {
         //Logoutボタンを左上に配置
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         
+        let rightBarButtonImage = UIImage(named: "chat.png")
+        let rightButtonImageView = UIImageView()
+        rightButtonImageView.translatesAutoresizingMaskIntoConstraints = false
+        rightButtonImageView.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        rightButtonImageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        rightButtonImageView.image = rightBarButtonImage
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: rightButtonImageView.image, style: .plain, target: self, action: #selector(handleNewMessage))
         //Charボタンを右上に配置
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Friends List", style: .plain, target: self, action: #selector(handleNewMessage))
+       // navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Friends List", style: .plain, target: self, action: )
         
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)

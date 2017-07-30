@@ -166,7 +166,7 @@ class LoginViewController: UIViewController {
         imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleSelectProfileImageView)))
         imageView.isUserInteractionEnabled = true
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 75
+        imageView.layer.cornerRadius = 65
         imageView.layer.masksToBounds = true
         imageView.isHidden = true
         
@@ -290,16 +290,18 @@ class LoginViewController: UIViewController {
     
     func setProfileImageView() {
         profileImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        profileImageView.bottomAnchor.constraint(equalTo: loginRegisterSegmentControl.topAnchor, constant: -12).isActive = true
-        profileImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        profileImageView.bottomAnchor.constraint(equalTo: loginRegisterSegmentControl.topAnchor, constant: -10).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 130).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 130).isActive = true
     }
     
     func setLogoImageView() {
         logoImageview.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        logoImageview.bottomAnchor.constraint(lessThanOrEqualTo: loginRegisterSegmentControl.topAnchor, constant: -50).isActive = true
-        logoImageview.widthAnchor.constraint(equalToConstant: 370).isActive = true
+        logoImageview.bottomAnchor.constraint(lessThanOrEqualTo: loginRegisterSegmentControl.topAnchor, constant: -40).isActive = true
+       // logoImageview.widthAnchor.constraint(equalToConstant: 370).isActive = true
         logoImageview.heightAnchor.constraint(equalToConstant: 120).isActive = true
+        logoImageview.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10).isActive = true
+        logoImageview.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive = true
     }
     
     var inputsContainerViewHeightAnchor: NSLayoutConstraint?

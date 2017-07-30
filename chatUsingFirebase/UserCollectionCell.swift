@@ -53,7 +53,7 @@ class UserCollectionCell: UICollectionViewCell {
         
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.layer.cornerRadius = 75
+        imageView.layer.cornerRadius = 65
         imageView.layer.masksToBounds = true
         return imageView
     }()
@@ -67,12 +67,12 @@ class UserCollectionCell: UICollectionViewCell {
         //profileImageView constraint
         profileImageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         profileImageView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -10).isActive = true
-        profileImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 130).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 130).isActive = true
         
         //textView constraint
         nameLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        nameLabel.centerYAnchor.constraint(equalTo: bottomAnchor, constant: -20).isActive = true
+        nameLabel.centerYAnchor.constraint(equalTo: bottomAnchor, constant: -15).isActive = true
         nameLabel.widthAnchor.constraint(equalToConstant: frame.width - 10).isActive = true
     }
     
