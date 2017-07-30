@@ -23,12 +23,12 @@ class MessageController: UITableViewController {
         navigationController?.navigationBar.tintColor = .white
         let customFont = UIFont(name: "Chalkboard SE", size: 17.0)!
         UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName: customFont], for: .normal)
-        
+
         //Logoutボタンを左上に配置
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         
         //Charボタンを右上に配置
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Chat", style: .plain, target: self, action: #selector(handleNewMessage))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Friends List", style: .plain, target: self, action: #selector(handleNewMessage))
         
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
@@ -180,7 +180,7 @@ class MessageController: UITableViewController {
         let nameLabel = UILabel()
         nameLabel.text = user.name
         nameLabel.textColor = .white
-        nameLabel.font = UIFont(name: "Chalkboard SE", size: 25)
+        nameLabel.font = UIFont(name: "Chalkboard SE", size: 20)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(nameLabel)
         

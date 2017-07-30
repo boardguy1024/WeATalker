@@ -20,7 +20,7 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
     var user: User? {
         didSet {
             self.navigationItem.title = user?.name
-            
+    
             observeMessage()
         }
     }
@@ -91,7 +91,7 @@ UINavigationControllerDelegate , UIImagePickerControllerDelegate {
         super.viewDidLoad()
         
         navigationController?.navigationBar.titleTextAttributes
-            = [NSFontAttributeName: UIFont(name: "Chalkboard SE", size: 16)!]
+            = [NSFontAttributeName: UIFont(name: "Chalkboard SE", size: 20)!]
         navigationController?.navigationBar.tintColor = .white
         collectionView?.backgroundView = backgroundImageView
         

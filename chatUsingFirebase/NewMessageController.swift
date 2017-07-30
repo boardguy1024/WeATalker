@@ -30,6 +30,9 @@ class NewMessageController: UICollectionViewController , UICollectionViewDelegat
         collectionView?.backgroundView = backgroundImageView
         setBackgroundImageView()
         
+        navigationItem.title = "Friends list"
+        navigationController?.navigationBar.titleTextAttributes
+            = [NSFontAttributeName: UIFont(name: "Chalkboard SE", size: 20)!]
         navigationController?.navigationBar.barTintColor = ubanBlueColor
         navigationController?.navigationBar.tintColor = .white
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "< Back", style: .plain, target: self, action: #selector(handleCancel))
@@ -81,8 +84,6 @@ class NewMessageController: UICollectionViewController , UICollectionViewDelegat
         let user = users[indexPath.row]
         
         cell.nameLabel.text = user.name
-       // cell.detailTextLabel?.text = user.email
-        
         
         if let profileImageUrl = user.profileImageUrl {
             
@@ -90,6 +91,13 @@ class NewMessageController: UICollectionViewController , UICollectionViewDelegat
             
             cell.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
             
+            cell.transform = CGAffineTransform(scaleX: 0.3, y: 2)
+            
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.3, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
+                cell.transform = CGAffineTransform.identity
+                
+            }, completion: nil)
+
         }
         return cell
 

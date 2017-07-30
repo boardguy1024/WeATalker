@@ -17,7 +17,7 @@
                BlueprintIdentifier = "A225BB7A1EF57C5B00BA2198"
                BuildableName = "chatUsingFirebase.app"
                BlueprintName = "chatUsingFirebase"
-               ReferencedContainer = "container:chatUsingFirebase.xcodeproj">
+               ReferencedContainer = "container:ChatUsingFirebase.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,7 +35,7 @@
             BlueprintIdentifier = "A225BB7A1EF57C5B00BA2198"
             BuildableName = "chatUsingFirebase.app"
             BlueprintName = "chatUsingFirebase"
-            ReferencedContainer = "container:chatUsingFirebase.xcodeproj">
+            ReferencedContainer = "container:ChatUsingFirebase.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -58,7 +58,7 @@
             BlueprintIdentifier = "A225BB7A1EF57C5B00BA2198"
             BuildableName = "chatUsingFirebase.app"
             BlueprintName = "chatUsingFirebase"
-            ReferencedContainer = "container:chatUsingFirebase.xcodeproj">
+            ReferencedContainer = "container:ChatUsingFirebase.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -77,7 +77,7 @@
             BlueprintIdentifier = "A225BB7A1EF57C5B00BA2198"
             BuildableName = "chatUsingFirebase.app"
             BlueprintName = "chatUsingFirebase"
-            ReferencedContainer = "container:chatUsingFirebase.xcodeproj">
+            ReferencedContainer = "container:ChatUsingFirebase.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
