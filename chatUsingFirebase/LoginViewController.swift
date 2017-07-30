@@ -30,7 +30,7 @@ class LoginViewController: UIViewController {
     // 登録ボタン
     lazy var registerButton: UIButton = {
         let button = UIButton(type: UIButtonType.system)
-        button.setTitle("Register", for: .normal)
+        button.setTitle("Login", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = UIColor(r: 237, g: 167, b: 0)
         button.tintColor = .white
