@@ -14,6 +14,7 @@ Firebase RealTimeDataBase,Storageを使ったチャットアプリを開発中�
 - 動画送受信、プレビュー
 - メッセージセルをスワイプで削除
 - Push通知機能
+- 設定画面
 ## スクリーンショット
 ![header](./background1.jpg)
 ![header](./background2.jpg)
