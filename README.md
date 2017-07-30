@@ -5,6 +5,6 @@
 ## 仕様
 
 ## スクリーンショット
-![header](./backgound1.jpg)
-![header](./backgound2.jpg)
+![header](./background1.jpg)
+![header](./background2.jpg)
 
