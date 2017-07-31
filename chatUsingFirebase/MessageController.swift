@@ -23,7 +23,7 @@ class MessageController: UITableViewController {
         navigationController?.navigationBar.tintColor = .white
         let customFont = UIFont(name: "Chalkboard SE", size: 17.0)!
         UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName: customFont], for: .normal)
-
+        
         //Logoutボタンを左上に配置
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         
@@ -36,13 +36,47 @@ class MessageController: UITableViewController {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: rightButtonImageView.image, style: .plain, target: self, action: #selector(handleNewMessage))
         //Charボタンを右上に配置
-       // navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Friends List", style: .plain, target: self, action: )
+        // navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Friends List", style: .plain, target: self, action: )
         
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         
         //ユーザーのログイン状態をチェック
         checkIfUserIsLoggedIn()
+        
+        //セルをユーザーがEditingできるように許可する
+        tableView.allowsMultipleSelectionDuringEditing = true
+        
+    }
+    
+    //MARK;:- tableview Delegate Methods
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    //セルをスワイプで削除
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+        
+        let message = messages[indexPath.row]
+        
+        if let partnerId = message.chatPartnerId() {
+            
+            let ref = FIRDatabase.database().reference().child("user-messages").child(uid).child(partnerId)
+            ref.removeValue(completionBlock: { (error, referent) in
+                
+                if error != nil {
+                    print(error!)
+                    return
+                }
+                //DBにも削除
+                DispatchQueue.main.async {
+                    //This is a way of updating the table but, not safe
+                    self.messages.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .automatic)
+                }
+            })
+        }
         
     }
     
@@ -93,9 +127,9 @@ class MessageController: UITableViewController {
         self.messages = Array(self.messagesDictionary.values)
         
         self.messages.sort(by: { (message1, message2) -> Bool in
-          
+            
             if let timeStamp1 = message1.timeStamp, let timeStamp2 = message2.timeStamp {
-              return timeStamp1 > timeStamp2
+                return timeStamp1 > timeStamp2
             }
             return false
         })
@@ -110,7 +144,7 @@ class MessageController: UITableViewController {
     
     func handleNewMessage() {
         
-   
+        
         // レイアウト作成
         let flowLayout = UICollectionViewFlowLayout()
         
