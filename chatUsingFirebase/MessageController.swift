@@ -69,12 +69,20 @@ class MessageController: UITableViewController {
                     print(error!)
                     return
                 }
+                //Indexで削除するのは必ずしも正しいデータを削除することでなないため、
+                //Dicのkeyで削除する
+                self.messagesDictionary.removeValue(forKey: partnerId)
+                //tableViewReload
+                self.attemptReloadOfTable()
+                /*
                 //DBにも削除
                 DispatchQueue.main.async {
+                    
                     //This is a way of updating the table but, not safe
                     self.messages.remove(at: indexPath.row)
                     tableView.deleteRows(at: [indexPath], with: .automatic)
                 }
+                */
             })
         }
         
