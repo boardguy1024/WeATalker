@@ -75,19 +75,20 @@ class MessageController: UITableViewController {
                 //tableViewReload
                 self.attemptReloadOfTable()
                 /*
-                //DBにも削除
-                DispatchQueue.main.async {
-                    
-                    //This is a way of updating the table but, not safe
-                    self.messages.remove(at: indexPath.row)
-                    tableView.deleteRows(at: [indexPath], with: .automatic)
-                }
-                */
+                 //DBにも削除
+                 DispatchQueue.main.async {
+                 
+                 //This is a way of updating the table but, not safe
+                 self.messages.remove(at: indexPath.row)
+                 tableView.deleteRows(at: [indexPath], with: .automatic)
+                 }
+                 */
             })
         }
         
     }
     
+    //UserMessageを観察
     func observeUserMessages() {
         
         guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
@@ -106,11 +107,22 @@ class MessageController: UITableViewController {
                 
             }, withCancel: nil)
         }, withCancel: nil)
+        
+        //refのchildになにか変化があった場合に呼び出される。
+        //直接DBからchildを削除した場合にもAPPにも更新をするため
+        ref.observe(.childRemoved, with: { (snapshot) in
+            
+          //TableViewを更新する。
+          self.messagesDictionary.removeValue(forKey: snapshot.key)
+          self.attemptReloadOfTable()
+            
+        }, withCancel: nil)
     }
     
     private func fetchMessageWithMessageId(messageId: String) {
         let messageRef = FIRDatabase.database().reference().child("messages").child(messageId)
         
+        //FirebaseDBに変化があった場合に呼び出される。
         messageRef.observeSingleEvent(of: .value, with: { (messageSnapshot) in
             
             if let dic = messageSnapshot.value as? [String: Any] {
@@ -124,6 +136,7 @@ class MessageController: UITableViewController {
                 self.attemptReloadOfTable()
             }
         })
+        
     }
     
     private func attemptReloadOfTable() {
